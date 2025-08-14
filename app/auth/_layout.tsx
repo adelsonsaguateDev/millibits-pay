@@ -16,15 +16,15 @@ export default function AuthLayout() {
         }}
       />
       <Stack.Screen
-        name="access-code"
+        name="login"
         options={{
-          title: "Código de Acesso",
+          title: "Entrar",
         }}
       />
       <Stack.Screen
-        name="register-code"
+        name="register"
         options={{
-          title: "Registrar Código",
+          title: "Criar Conta",
         }}
       />
     </Stack>

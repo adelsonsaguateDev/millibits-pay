@@ -1,9 +1,10 @@
 import { Ionicons } from "@expo/vector-icons";
 import { router } from "expo-router";
+import { useState } from "react";
 import {
-  ActivityIndicator,
   Alert,
   StyleSheet,
+  TextInput,
   TouchableOpacity,
   View,
 } from "react-native";
@@ -13,108 +14,59 @@ import { ThemedText } from "@/components/ThemedText";
 import { ThemedView } from "@/components/ThemedView";
 import { AuthColors } from "@/constants/Colors";
 import { useAuth } from "@/hooks/useAuth";
-import { useBiometrics } from "@/hooks/useBiometrics";
 
 export default function AuthScreen() {
-  const { signIn, hasAccessCode, isFirstTime } = useAuth();
-  const {
-    isBiometricAvailable,
-    biometricType,
-    isAuthenticating,
-    authenticate,
-  } = useBiometrics();
+  const { signIn, hasCredentials, isFirstTime, verifyCredentials } = useAuth();
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [isLoading, setIsLoading] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
 
-  const handleBiometricAuth = async () => {
-    if (!isBiometricAvailable || isAuthenticating) {
+  const handleSubmit = async () => {
+    if (!email.trim() || !password.trim()) {
+      Alert.alert("Erro", "Por favor, preencha todos os campos.");
       return;
     }
 
+    // Validação básica de email
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(email.trim())) {
+      Alert.alert("Erro", "Por favor, insira um email válido.");
+      return;
+    }
+
+    setIsLoading(true);
+
     try {
-      console.log("🔑 Iniciando autenticação biométrica...");
+      // Validar as credenciais usando a função do hook
+      const isValid = await verifyCredentials(email.trim(), password);
 
-      const result = await authenticate(
-        "Autentique-se para acessar o MilleBits Pay"
-      );
-
-      if (result.success) {
-        console.log("🔑 Autenticação biométrica bem-sucedida!");
-        console.log("🔑 Chamando signIn...");
+      if (isValid) {
         await signIn();
-        console.log("🔑 signIn concluído!");
+        console.log("🔑 Login realizado com sucesso!");
       } else {
-        console.error("❌ Falha na autenticação biométrica:", result.error);
-
-        // Show user-friendly error message
-        let errorMessage = "Falha na autenticação biométrica.";
-
-        if (result.error) {
-          if (result.error.includes("UserCancel")) {
-            errorMessage = "Autenticação cancelada pelo usuário.";
-          } else if (result.error.includes("UserFallback")) {
-            errorMessage = "Usuário escolheu usar código de acesso.";
-          } else if (result.error.includes("SystemCancel")) {
-            errorMessage = "Autenticação cancelada pelo sistema.";
-          } else if (result.error.includes("AuthenticationFailed")) {
-            errorMessage = "Autenticação falhou. Tente novamente.";
-          } else if (result.error.includes("NotEnrolled")) {
-            errorMessage = "Biometria não configurada neste dispositivo.";
-          } else if (result.error.includes("NotAvailable")) {
-            errorMessage = "Biometria não disponível neste dispositivo.";
-          }
-        }
-
-        Alert.alert("Erro de Autenticação", errorMessage);
+        Alert.alert("Erro", "Email ou senha incorretos. Tente novamente.");
+        setPassword("");
       }
     } catch (error) {
-      console.error("❌ Erro na autenticação biométrica:", error);
-      Alert.alert(
-        "Erro",
-        "Ocorreu um erro inesperado durante a autenticação. Tente novamente."
-      );
+      console.error("❌ Erro no login:", error);
+      Alert.alert("Erro", "Ocorreu um erro inesperado. Tente novamente.");
+    } finally {
+      setIsLoading(false);
     }
   };
 
-  const handleAccessCode = () => {
-    // Se é a primeira vez ou não tem código configurado, vai para registro
-    if (isFirstTime || !hasAccessCode) {
-      router.push("/auth/register-code" as any);
+  const handleCredentials = () => {
+    // Se é a primeira vez ou não tem credenciais configuradas, vai para registro
+    if (isFirstTime || !hasCredentials) {
+      router.push("/auth/register" as any);
     } else {
-      // Se já tem código, vai para login
-      router.push("/auth/access-code");
+      // Se já tem credenciais, vai para login
+      router.push("/auth/login");
     }
   };
 
-  const getBiometricButtonText = () => {
-    if (isAuthenticating) {
-      return "Autenticando...";
-    }
-
-    if (isBiometricAvailable === null) {
-      return "Verificando...";
-    }
-
-    if (isBiometricAvailable) {
-      return `Iniciar com ${biometricType}`;
-    }
-
-    return "Biometria não disponível";
-  };
-
-  const getBiometricButtonStyle = () => {
-    if (isBiometricAvailable === false) {
-      return [styles.biometricButton, styles.disabledButton];
-    }
-    return styles.biometricButton;
-  };
-
-  const getBiometricButtonTextStyle = () => {
-    if (isBiometricAvailable === false) {
-      return [styles.biometricButtonText, styles.disabledButtonText];
-    }
-    return styles.biometricButtonText;
-  };
-
-  // Se é a primeira vez, mostrar apenas o botão de código de acesso
+  // Se é a primeira vez, mostrar apenas o botão de credenciais
   if (isFirstTime) {
     return (
       <ThemedView style={styles.container}>
@@ -139,18 +91,18 @@ export default function AuthScreen() {
               Bem-vindo ao MilleBits Pay!
             </ThemedText>
             <ThemedText style={styles.welcomeDescription}>
-              Configure seu código de acesso para começar a usar o app
+              Configure seu email e senha para começar a usar o app
             </ThemedText>
           </View>
 
-          {/* Botão de código de acesso */}
+          {/* Botão de credenciais */}
           <View style={styles.buttonContainer}>
             <TouchableOpacity
               style={styles.accessCodeButton}
-              onPress={handleAccessCode}
+              onPress={handleCredentials}
             >
               <ThemedText style={styles.accessCodeButtonText}>
-                Configurar código de acesso
+                Configurar email e senha
               </ThemedText>
             </TouchableOpacity>
           </View>
@@ -159,7 +111,7 @@ export default function AuthScreen() {
     );
   }
 
-  // Tela normal com biometria e código de acesso
+  // Tela normal com campos de login
   return (
     <ThemedView style={styles.container}>
       {/* Banner rosa no topo com logo Mille-bit */}
@@ -177,50 +129,82 @@ export default function AuthScreen() {
           </View>
         </View>
 
-        {/* Botões de autenticação */}
-        <View style={styles.buttonContainer}>
-          {/* Botão de biometria */}
-          <TouchableOpacity
-            style={getBiometricButtonStyle()}
-            onPress={handleBiometricAuth}
-            disabled={!isBiometricAvailable || isAuthenticating}
-          >
-            {isAuthenticating ? (
-              <View style={styles.loadingContainer}>
-                <ActivityIndicator color="white" size="small" />
-                <ThemedText
-                  style={[getBiometricButtonTextStyle(), styles.loadingText]}
-                >
-                  {getBiometricButtonText()}
-                </ThemedText>
-              </View>
-            ) : (
-              <ThemedText style={getBiometricButtonTextStyle()}>
-                {getBiometricButtonText()}
-              </ThemedText>
-            )}
-          </TouchableOpacity>
-
-          {/* Botão de código de acesso */}
-          <TouchableOpacity
-            style={styles.accessCodeButton}
-            onPress={handleAccessCode}
-          >
-            <ThemedText style={styles.accessCodeButtonText}>
-              Código de acesso
-            </ThemedText>
-          </TouchableOpacity>
+        {/* Título */}
+        <View style={styles.textContainer}>
+          <ThemedText style={styles.title}>Entrar</ThemedText>
+          <ThemedText style={styles.description}>
+            Digite seu email e senha para acessar sua conta
+          </ThemedText>
         </View>
 
-        {/* Informações adicionais */}
-        {isBiometricAvailable === false && (
-          <View style={styles.infoContainer}>
-            <ThemedText style={styles.infoText}>
-              Para usar a biometria, configure o Face ID, Touch ID ou PIN no seu
-              dispositivo.
-            </ThemedText>
+        {/* Campo de email */}
+        <View style={styles.inputContainer}>
+          <ThemedText style={styles.inputLabel}>Email</ThemedText>
+          <TextInput
+            style={styles.textInput}
+            value={email}
+            onChangeText={setEmail}
+            placeholder="seu@email.com"
+            placeholderTextColor="#D1D5DB"
+            keyboardType="email-address"
+            autoCapitalize="none"
+            autoCorrect={false}
+            selectionColor={AuthColors.primary}
+          />
+        </View>
+
+        {/* Campo de senha */}
+        <View style={styles.inputContainer}>
+          <ThemedText style={styles.inputLabel}>Senha</ThemedText>
+          <View style={styles.passwordContainer}>
+            <TextInput
+              style={styles.passwordInput}
+              value={password}
+              onChangeText={setPassword}
+              placeholder="Sua senha"
+              placeholderTextColor="#D1D5DB"
+              secureTextEntry={!showPassword}
+              selectionColor={AuthColors.primary}
+            />
+            <TouchableOpacity
+              style={styles.eyeButton}
+              onPress={() => setShowPassword(!showPassword)}
+            >
+              <Ionicons
+                name={showPassword ? "eye-off" : "eye"}
+                size={20}
+                color="#666666"
+              />
+            </TouchableOpacity>
           </View>
-        )}
+        </View>
+
+        {/* Botão de login */}
+        <TouchableOpacity
+          style={[
+            styles.submitButton,
+            (!email.trim() || !password.trim()) && styles.disabledButton,
+          ]}
+          onPress={handleSubmit}
+          disabled={!email.trim() || !password.trim() || isLoading}
+        >
+          <ThemedText style={styles.submitButtonText}>
+            {isLoading ? "Entrando..." : "Entrar"}
+          </ThemedText>
+        </TouchableOpacity>
+
+        {/* Texto para usuários sem conta */}
+        <View style={styles.noAccountContainer}>
+          <ThemedText style={styles.noAccountText}>
+            Não tem uma conta?{" "}
+            <ThemedText
+              style={styles.linkText}
+              onPress={() => router.push("/auth/register" as any)}
+            >
+              Criar conta
+            </ThemedText>
+          </ThemedText>
+        </View>
       </View>
     </ThemedView>
   );
@@ -253,7 +237,7 @@ const styles = StyleSheet.create({
     bottom: 0,
     justifyContent: "center",
     alignItems: "center",
-    paddingHorizontal: 40,
+    paddingHorizontal: 32,
     paddingBottom: 40,
   },
   userIconContainer: {
@@ -267,57 +251,9 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     alignItems: "center",
   },
-  biometricStatus: {
-    marginBottom: 30,
-    paddingHorizontal: 20,
-    paddingVertical: 10,
-    backgroundColor: "#f8f9fa",
-    borderRadius: 8,
-  },
-  biometricStatusText: {
-    fontSize: 14,
-    color: "#666666",
-    textAlign: "center",
-  },
   buttonContainer: {
     width: "100%",
     gap: 20,
-  },
-  biometricButton: {
-    backgroundColor: AuthColors.primary,
-    paddingVertical: 16,
-    paddingHorizontal: 24,
-    borderRadius: 999,
-    alignItems: "center",
-    shadowColor: AuthColors.shadow,
-    shadowOffset: {
-      width: 0,
-      height: 2,
-    },
-    shadowOpacity: 0.1,
-    shadowRadius: 4,
-    elevation: 3,
-  },
-  disabledButton: {
-    backgroundColor: "#e0e0e0",
-    shadowOpacity: 0,
-    elevation: 0,
-  },
-  biometricButtonText: {
-    color: "white",
-    fontSize: 18,
-    fontWeight: "bold",
-  },
-  disabledButtonText: {
-    color: "#666666",
-  },
-  loadingContainer: {
-    flexDirection: "row",
-    alignItems: "center",
-    gap: 10,
-  },
-  loadingText: {
-    marginLeft: 10,
   },
   accessCodeButton: {
     backgroundColor: AuthColors.white,
@@ -341,16 +277,6 @@ const styles = StyleSheet.create({
     fontSize: 18,
     fontWeight: "bold",
   },
-  infoContainer: {
-    marginTop: 30,
-    paddingHorizontal: 20,
-  },
-  infoText: {
-    fontSize: 14,
-    color: "#666666",
-    textAlign: "center",
-    lineHeight: 20,
-  },
   welcomeContainer: {
     marginBottom: 40,
     alignItems: "center",
@@ -368,5 +294,105 @@ const styles = StyleSheet.create({
     color: "#6C757D",
     textAlign: "center",
     lineHeight: 22,
+  },
+  textContainer: {
+    marginBottom: 32,
+    alignItems: "center",
+  },
+  title: {
+    fontSize: 24,
+    lineHeight: 28,
+    textAlign: "center",
+    fontWeight: "bold",
+    color: "#1a1a1a",
+    marginBottom: 10,
+  },
+  description: {
+    fontSize: 16,
+    color: "#6C757D",
+    textAlign: "center",
+    lineHeight: 22,
+  },
+  inputContainer: {
+    width: "100%",
+    marginBottom: 16,
+  },
+  inputLabel: {
+    fontSize: 16,
+    fontWeight: "600",
+    color: "#1a1a1a",
+    marginBottom: 8,
+  },
+  textInput: {
+    width: "100%",
+    height: 48,
+    borderWidth: 1,
+    borderColor: "#e0e0e0",
+    borderRadius: 8,
+    paddingHorizontal: 12,
+    fontSize: 16,
+    color: "#1a1a1a",
+    backgroundColor: "#f9fafb",
+  },
+  passwordContainer: {
+    position: "relative",
+    width: "100%",
+  },
+  passwordInput: {
+    width: "100%",
+    height: 48,
+    borderWidth: 1,
+    borderColor: "#e0e0e0",
+    borderRadius: 8,
+    paddingHorizontal: 12,
+    paddingRight: 48,
+    fontSize: 16,
+    color: "#1a1a1a",
+    backgroundColor: "#f9fafb",
+  },
+  eyeButton: {
+    position: "absolute",
+    right: 12,
+    top: 14,
+    padding: 4,
+  },
+  submitButton: {
+    backgroundColor: AuthColors.primary,
+    paddingVertical: 16,
+    paddingHorizontal: 24,
+    borderRadius: 999,
+    alignItems: "center",
+    shadowColor: AuthColors.shadow,
+    shadowOffset: {
+      width: 0,
+      height: 2,
+    },
+    shadowOpacity: 0.1,
+    shadowRadius: 4,
+    elevation: 3,
+    minWidth: 200,
+    marginTop: 20,
+  },
+  disabledButton: {
+    backgroundColor: "#e0e0e0",
+    shadowOpacity: 0,
+    elevation: 0,
+  },
+  submitButtonText: {
+    color: "white",
+    fontSize: 18,
+    fontWeight: "bold",
+  },
+  noAccountContainer: {
+    marginTop: 30,
+    alignItems: "center",
+  },
+  noAccountText: {
+    fontSize: 14,
+    color: "#666666",
+  },
+  linkText: {
+    color: AuthColors.primary,
+    fontWeight: "bold",
   },
 });

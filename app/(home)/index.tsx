@@ -3,10 +3,12 @@ import { ThemedText } from "@/components/ThemedText";
 import { Colors } from "@/constants/Colors";
 import { useAuth } from "@/hooks/useAuth";
 import { LinearGradient } from "expo-linear-gradient";
+import { useRouter } from "expo-router";
 import { StyleSheet, TouchableOpacity, View } from "react-native";
 
 export default function HomeScreen() {
   const { signOut } = useAuth();
+  const router = useRouter();
 
   return (
     <LinearGradient
@@ -101,13 +103,16 @@ export default function HomeScreen() {
       </View>
 
       {/* Floating Action Button */}
-      <TouchableOpacity style={styles.floatingButton}>
+      <TouchableOpacity
+        style={styles.floatingButton}
+        onPress={() => router.push("/(home)/add-card")}
+      >
         <View style={styles.floatingButtonContent}>
           <ThemedText style={styles.floatingButtonLabel}>
             Associar cartão à carteira
           </ThemedText>
           <View style={styles.floatingButtonIcon}>
-            <ThemedText style={styles.floatingButtonArrow}>↑</ThemedText>
+            <ThemedText style={styles.floatingButtonArrow}>+</ThemedText>
           </View>
         </View>
       </TouchableOpacity>

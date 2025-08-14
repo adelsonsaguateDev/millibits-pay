@@ -2,24 +2,26 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 import { router } from "expo-router";
 import { useEffect, useState } from "react";
 
-const ACCESS_CODE_KEY = "@millebits:access_code";
+const EMAIL_KEY = "@millebits:email";
+const PASSWORD_KEY = "@millebits:password";
+const USERNAME_KEY = "@millebits:username";
 const IS_FIRST_TIME_KEY = "@millebits:is_first_time";
 
 export function useAuth() {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
-  const [hasAccessCode, setHasAccessCode] = useState<boolean | null>(null);
+  const [hasCredentials, setHasCredentials] = useState<boolean | null>(null);
   const [isFirstTime, setIsFirstTime] = useState<boolean | null>(null);
 
   console.log("🔑 useAuth render:", {
     isAuthenticated,
     isLoading,
-    hasAccessCode,
+    hasCredentials,
     isFirstTime,
   });
 
   useEffect(() => {
-    // Verificar se o usuário já está autenticado e se tem código de acesso
+    // Verificar se o usuário já está autenticado e se tem credenciais
     checkAuthStatus();
   }, []);
 
@@ -30,14 +32,15 @@ export function useAuth() {
       const isFirstTimeUser = firstTimeValue === null;
       setIsFirstTime(isFirstTimeUser);
 
-      // Verificar se já tem código de acesso configurado
-      const accessCode = await AsyncStorage.getItem(ACCESS_CODE_KEY);
-      const hasCode = accessCode !== null;
-      setHasAccessCode(hasCode);
+      // Verificar se já tem credenciais configuradas
+      const email = await AsyncStorage.getItem(EMAIL_KEY);
+      const password = await AsyncStorage.getItem(PASSWORD_KEY);
+      const hasCreds = email !== null && password !== null;
+      setHasCredentials(hasCreds);
 
       console.log("🔑 checkAuthStatus executado:", {
         isFirstTimeUser,
-        hasCode,
+        hasCreds,
       });
       setIsLoading(false);
     } catch (error) {
@@ -69,51 +72,63 @@ export function useAuth() {
     }
   };
 
-  const setAccessCode = async (code: string) => {
+  const setCredentials = async (
+    username: string,
+    email: string,
+    password: string
+  ) => {
     try {
-      await AsyncStorage.setItem(ACCESS_CODE_KEY, code);
+      await AsyncStorage.setItem(USERNAME_KEY, username);
+      await AsyncStorage.setItem(EMAIL_KEY, email);
+      await AsyncStorage.setItem(PASSWORD_KEY, password);
       await AsyncStorage.setItem(IS_FIRST_TIME_KEY, "false");
-      setHasAccessCode(true);
+      setHasCredentials(true);
       setIsFirstTime(false);
-      console.log("🔑 Código de acesso configurado com sucesso");
+      console.log("🔑 Credenciais configuradas com sucesso");
       return true;
     } catch (error) {
-      console.error("Erro ao configurar código de acesso:", error);
+      console.error("Erro ao configurar credenciais:", error);
       return false;
     }
   };
 
-  const verifyAccessCode = async (code: string): Promise<boolean> => {
+  const verifyCredentials = async (
+    email: string,
+    password: string
+  ): Promise<boolean> => {
     try {
-      const storedCode = await AsyncStorage.getItem(ACCESS_CODE_KEY);
-      return storedCode === code;
+      const storedEmail = await AsyncStorage.getItem(EMAIL_KEY);
+      const storedPassword = await AsyncStorage.getItem(PASSWORD_KEY);
+      return storedEmail === email && storedPassword === password;
     } catch (error) {
-      console.error("Erro ao verificar código de acesso:", error);
+      console.error("Erro ao verificar credenciais:", error);
       return false;
     }
   };
 
-  const clearAccessCode = async () => {
+  const clearCredentials = async () => {
     try {
-      await AsyncStorage.removeItem(ACCESS_CODE_KEY);
+      await AsyncStorage.removeItem(USERNAME_KEY);
+      await AsyncStorage.removeItem(EMAIL_KEY);
+      await AsyncStorage.removeItem(PASSWORD_KEY);
       await AsyncStorage.removeItem(IS_FIRST_TIME_KEY);
-      setHasAccessCode(false);
+      setHasCredentials(false);
       setIsFirstTime(true);
-      console.log("🔑 Código de acesso removido");
+      console.log("🔑 Credenciais removidas");
     } catch (error) {
-      console.error("Erro ao remover código de acesso:", error);
+      console.error("Erro ao remover credenciais:", error);
     }
   };
 
   return {
     isAuthenticated,
     isLoading,
-    hasAccessCode,
+    hasCredentials,
     isFirstTime,
     signIn,
     signOut,
-    setAccessCode,
-    verifyAccessCode,
-    clearAccessCode,
+    setCredentials,
+    verifyCredentials,
+    clearCredentials,
   };
 }

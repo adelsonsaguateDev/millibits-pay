@@ -205,12 +205,12 @@ const styles = StyleSheet.create({
   mainContent: {
     flex: 1,
     alignItems: "center",
-    paddingHorizontal: 40,
-    paddingTop: 60,
+    paddingHorizontal: 32,
+    paddingTop: 40,
   },
   textContainer: {
     alignItems: "center",
-    marginBottom: 40,
+    marginBottom: 32,
   },
   title: {
     fontSize: 24,
@@ -228,7 +228,7 @@ const styles = StyleSheet.create({
   },
   inputContainer: {
     width: "100%",
-    marginBottom: 24,
+    marginBottom: 16,
   },
   inputLabel: {
     fontSize: 16,
@@ -238,11 +238,11 @@ const styles = StyleSheet.create({
   },
   textInput: {
     width: "100%",
-    height: 56,
-    borderWidth: 2,
+    height: 48,
+    borderWidth: 1,
     borderColor: "#e0e0e0",
-    borderRadius: 12,
-    paddingHorizontal: 16,
+    borderRadius: 8,
+    paddingHorizontal: 12,
     fontSize: 16,
     color: "#1a1a1a",
     backgroundColor: "#f9fafb",
@@ -253,20 +253,20 @@ const styles = StyleSheet.create({
   },
   passwordInput: {
     width: "100%",
-    height: 56,
-    borderWidth: 2,
+    height: 48,
+    borderWidth: 1,
     borderColor: "#e0e0e0",
-    borderRadius: 12,
-    paddingHorizontal: 16,
-    paddingRight: 56,
+    borderRadius: 8,
+    paddingHorizontal: 12,
+    paddingRight: 48,
     fontSize: 16,
     color: "#1a1a1a",
     backgroundColor: "#f9fafb",
   },
   eyeButton: {
     position: "absolute",
-    right: 16,
-    top: 18,
+    right: 12,
+    top: 14,
     padding: 4,
   },
   submitButton: {

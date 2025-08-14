@@ -1,5 +1,4 @@
 import { Ionicons } from "@expo/vector-icons";
-import { router } from "expo-router";
 import React, { useState } from "react";
 import {
   Alert,
@@ -16,17 +15,17 @@ import { ThemedText } from "@/components/ThemedText";
 import { ThemedView } from "@/components/ThemedView";
 import { AuthColors } from "@/constants/Colors";
 import { useAuth } from "@/hooks/useAuth";
+import { router } from "expo-router";
 
-export default function RegisterScreen() {
-  const { setCredentials } = useAuth();
-  const [username, setUsername] = useState("");
+export default function LoginScreen() {
+  const { signIn, verifyCredentials } = useAuth();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
 
   const handleSubmit = async () => {
-    if (!username.trim() || !email.trim() || !password) {
+    if (!email.trim() || !password.trim()) {
       Alert.alert("Erro", "Por favor, preencha todos os campos.");
       return;
     }
@@ -38,37 +37,21 @@ export default function RegisterScreen() {
       return;
     }
 
-    // Validação de senha
-    if (password.length < 6) {
-      Alert.alert("Erro", "A senha deve ter pelo menos 6 caracteres.");
-      return;
-    }
-
     setIsLoading(true);
 
     try {
-      // Configurar as credenciais
-      const success = await setCredentials(
-        username.trim(),
-        email.trim(),
-        password
-      );
+      // Validar as credenciais usando a função do hook
+      const isValid = await verifyCredentials(email.trim(), password);
 
-      if (success) {
-        Alert.alert("Sucesso!", "Conta criada com sucesso!", [
-          {
-            text: "OK",
-            onPress: () => {
-              // Redirecionar para a tela principal
-              router.replace("/(home)");
-            },
-          },
-        ]);
+      if (isValid) {
+        await signIn();
+        console.log("🔑 Login realizado com sucesso!");
       } else {
-        Alert.alert("Erro", "Não foi possível criar a conta. Tente novamente.");
+        Alert.alert("Erro", "Email ou senha incorretos. Tente novamente.");
+        setPassword("");
       }
     } catch (error) {
-      console.error("❌ Erro ao criar conta:", error);
+      console.error("❌ Erro no login:", error);
       Alert.alert("Erro", "Ocorreu um erro inesperado. Tente novamente.");
     } finally {
       setIsLoading(false);
@@ -79,7 +62,7 @@ export default function RegisterScreen() {
     router.back();
   };
 
-  const canSubmit = username.trim() && email.trim() && password;
+  const canSubmit = email.trim() && password.trim();
 
   return (
     <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
@@ -89,32 +72,18 @@ export default function RegisterScreen() {
           <TouchableOpacity style={styles.backButton} onPress={handleBack}>
             <Ionicons name="arrow-back" size={24} color="white" />
           </TouchableOpacity>
-          <MilleBitLogo width={60} height={55} color="white" />
+          <ThemedText style={styles.logoText}>BitPay</ThemedText>
+          <MilleBitLogo width={40} color="white" />
         </View>
 
         {/* Conteúdo principal */}
         <View style={styles.mainContent}>
           {/* Título e descrição */}
           <View style={styles.textContainer}>
-            <ThemedText style={styles.title}>Criar conta</ThemedText>
+            <ThemedText style={styles.title}>Entrar</ThemedText>
             <ThemedText style={styles.description}>
-              Configure seu email e senha para começar a usar o app
+              Digite seu email e senha para acessar sua conta
             </ThemedText>
-          </View>
-
-          {/* Campo de username */}
-          <View style={styles.inputContainer}>
-            <ThemedText style={styles.inputLabel}>Nome de usuário</ThemedText>
-            <TextInput
-              style={styles.textInput}
-              value={username}
-              onChangeText={setUsername}
-              placeholder="Seu nome de usuário"
-              placeholderTextColor="#D1D5DB"
-              autoCapitalize="words"
-              autoCorrect={false}
-              selectionColor={AuthColors.primary}
-            />
           </View>
 
           {/* Campo de email */}
@@ -141,7 +110,7 @@ export default function RegisterScreen() {
                 style={styles.passwordInput}
                 value={password}
                 onChangeText={setPassword}
-                placeholder="Sua senha (mín. 6 caracteres)"
+                placeholder="Sua senha"
                 placeholderTextColor="#D1D5DB"
                 secureTextEntry={!showPassword}
                 selectionColor={AuthColors.primary}
@@ -166,14 +135,14 @@ export default function RegisterScreen() {
             disabled={!canSubmit || isLoading}
           >
             <ThemedText style={styles.submitButtonText}>
-              {isLoading ? "Criando conta..." : "Criar conta"}
+              {isLoading ? "Entrando..." : "Entrar"}
             </ThemedText>
           </TouchableOpacity>
 
           {/* Informações adicionais */}
           <View style={styles.infoContainer}>
             <ThemedText style={styles.infoText}>
-              Suas informações estão seguras e não serão compartilhadas.
+              Esqueceu sua senha? Entre em contato com o suporte.
             </ThemedText>
           </View>
         </View>
@@ -196,6 +165,11 @@ const styles = StyleSheet.create({
     paddingTop: 40,
     position: "relative",
   },
+  logoText: {
+    fontSize: 24,
+    fontWeight: "bold",
+    color: "white",
+  },
   backButton: {
     position: "absolute",
     left: 24,
@@ -205,12 +179,12 @@ const styles = StyleSheet.create({
   mainContent: {
     flex: 1,
     alignItems: "center",
-    paddingHorizontal: 40,
-    paddingTop: 60,
+    paddingHorizontal: 32,
+    paddingTop: 40,
   },
   textContainer: {
     alignItems: "center",
-    marginBottom: 40,
+    marginBottom: 32,
   },
   title: {
     fontSize: 24,
@@ -228,7 +202,7 @@ const styles = StyleSheet.create({
   },
   inputContainer: {
     width: "100%",
-    marginBottom: 24,
+    marginBottom: 16,
   },
   inputLabel: {
     fontSize: 16,
@@ -238,11 +212,11 @@ const styles = StyleSheet.create({
   },
   textInput: {
     width: "100%",
-    height: 56,
-    borderWidth: 2,
+    height: 48,
+    borderWidth: 1,
     borderColor: "#e0e0e0",
-    borderRadius: 12,
-    paddingHorizontal: 16,
+    borderRadius: 8,
+    paddingHorizontal: 12,
     fontSize: 16,
     color: "#1a1a1a",
     backgroundColor: "#f9fafb",
@@ -253,20 +227,20 @@ const styles = StyleSheet.create({
   },
   passwordInput: {
     width: "100%",
-    height: 56,
-    borderWidth: 2,
+    height: 48,
+    borderWidth: 1,
     borderColor: "#e0e0e0",
-    borderRadius: 12,
-    paddingHorizontal: 16,
-    paddingRight: 56,
+    borderRadius: 8,
+    paddingHorizontal: 12,
+    paddingRight: 48,
     fontSize: 16,
     color: "#1a1a1a",
     backgroundColor: "#f9fafb",
   },
   eyeButton: {
     position: "absolute",
-    right: 16,
-    top: 18,
+    right: 12,
+    top: 14,
     padding: 4,
   },
   submitButton: {

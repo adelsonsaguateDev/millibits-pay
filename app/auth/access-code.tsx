@@ -1,5 +1,5 @@
 import { Ionicons } from "@expo/vector-icons";
-import React, { useRef, useState } from "react";
+import React, { useState } from "react";
 import {
   Alert,
   Keyboard,
@@ -17,58 +17,41 @@ import { AuthColors } from "@/constants/Colors";
 import { useAuth } from "@/hooks/useAuth";
 import { router } from "expo-router";
 
-const ACCESS_CODE_LENGTH = 6;
-
-export default function AccessCodeScreen() {
-  const { signIn, verifyAccessCode } = useAuth();
-  const [accessCode, setAccessCode] = useState<string[]>(
-    new Array(ACCESS_CODE_LENGTH).fill("")
-  );
+export default function LoginScreen() {
+  const { signIn, verifyCredentials } = useAuth();
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
   const [isLoading, setIsLoading] = useState(false);
-  const inputRefs = useRef<TextInput[]>([]);
-
-  const handleCodeChange = (text: string, index: number) => {
-    const newCode = [...accessCode];
-    newCode[index] = text;
-    setAccessCode(newCode);
-
-    // Mover para o próximo campo se houver texto
-    if (text && index < ACCESS_CODE_LENGTH - 1) {
-      inputRefs.current[index + 1]?.focus();
-    }
-  };
-
-  const handleKeyPress = (e: any, index: number) => {
-    // Voltar para o campo anterior se pressionar backspace e o campo estiver vazio
-    if (e.nativeEvent.key === "Backspace" && !accessCode[index] && index > 0) {
-      inputRefs.current[index - 1]?.focus();
-    }
-  };
+  const [showPassword, setShowPassword] = useState(false);
 
   const handleSubmit = async () => {
-    const code = accessCode.join("");
+    if (!email.trim() || !password.trim()) {
+      Alert.alert("Erro", "Por favor, preencha todos os campos.");
+      return;
+    }
 
-    if (code.length !== ACCESS_CODE_LENGTH) {
-      Alert.alert("Erro", "Por favor, insira o código completo de 6 dígitos.");
+    // Validação básica de email
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(email.trim())) {
+      Alert.alert("Erro", "Por favor, insira um email válido.");
       return;
     }
 
     setIsLoading(true);
 
     try {
-      // Validar o código usando a função do hook
-      const isValid = await verifyAccessCode(code);
+      // Validar as credenciais usando a função do hook
+      const isValid = await verifyCredentials(email.trim(), password);
 
       if (isValid) {
         await signIn();
-        console.log("🔑 Código de acesso válido!");
+        console.log("🔑 Login realizado com sucesso!");
       } else {
-        Alert.alert("Erro", "Código de acesso inválido. Tente novamente.");
-        setAccessCode(new Array(ACCESS_CODE_LENGTH).fill(""));
-        inputRefs.current[0]?.focus();
+        Alert.alert("Erro", "Email ou senha incorretos. Tente novamente.");
+        setPassword("");
       }
     } catch (error) {
-      console.error("❌ Erro na validação do código:", error);
+      console.error("❌ Erro no login:", error);
       Alert.alert("Erro", "Ocorreu um erro inesperado. Tente novamente.");
     } finally {
       setIsLoading(false);
@@ -79,7 +62,7 @@ export default function AccessCodeScreen() {
     router.back();
   };
 
-  const isCodeComplete = accessCode.every((digit) => digit !== "");
+  const canSubmit = email.trim() && password.trim();
 
   return (
     <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
@@ -97,52 +80,69 @@ export default function AccessCodeScreen() {
         <View style={styles.mainContent}>
           {/* Título e descrição */}
           <View style={styles.textContainer}>
-            <ThemedText style={styles.title}>Código de Acesso</ThemedText>
+            <ThemedText style={styles.title}>Entrar</ThemedText>
             <ThemedText style={styles.description}>
-              Digite o código de 6 dígitos para acessar sua conta
+              Digite seu email e senha para acessar sua conta
             </ThemedText>
           </View>
 
-          {/* Campos de entrada do código */}
-          <View style={styles.codeContainer}>
-            {accessCode.map((digit, index) => (
+          {/* Campo de email */}
+          <View style={styles.inputContainer}>
+            <ThemedText style={styles.inputLabel}>Email</ThemedText>
+            <TextInput
+              style={styles.textInput}
+              value={email}
+              onChangeText={setEmail}
+              placeholder="seu@email.com"
+              placeholderTextColor="#D1D5DB"
+              keyboardType="email-address"
+              autoCapitalize="none"
+              autoCorrect={false}
+              selectionColor={AuthColors.primary}
+            />
+          </View>
+
+          {/* Campo de senha */}
+          <View style={styles.inputContainer}>
+            <ThemedText style={styles.inputLabel}>Senha</ThemedText>
+            <View style={styles.passwordContainer}>
               <TextInput
-                key={index}
-                ref={(ref) => {
-                  if (ref) inputRefs.current[index] = ref;
-                }}
-                style={styles.codeInput}
-                value={digit ? "•" : ""}
-                onChangeText={(text) => handleCodeChange(text, index)}
-                onKeyPress={(e) => handleKeyPress(e, index)}
-                keyboardType="numeric"
-                maxLength={1}
-                selectTextOnFocus
-                selectionColor={AuthColors.primary}
-                placeholder="•"
+                style={styles.passwordInput}
+                value={password}
+                onChangeText={setPassword}
+                placeholder="Sua senha"
                 placeholderTextColor="#D1D5DB"
+                secureTextEntry={!showPassword}
+                selectionColor={AuthColors.primary}
               />
-            ))}
+              <TouchableOpacity
+                style={styles.eyeButton}
+                onPress={() => setShowPassword(!showPassword)}
+              >
+                <Ionicons
+                  name={showPassword ? "eye-off" : "eye"}
+                  size={20}
+                  color="#666666"
+                />
+              </TouchableOpacity>
+            </View>
           </View>
 
           {/* Botão de envio */}
           <TouchableOpacity
-            style={[
-              styles.submitButton,
-              !isCodeComplete && styles.disabledButton,
-            ]}
+            style={[styles.submitButton, !canSubmit && styles.disabledButton]}
             onPress={handleSubmit}
-            disabled={!isCodeComplete || isLoading}
+            disabled={!canSubmit || isLoading}
           >
             <ThemedText style={styles.submitButtonText}>
-              {isLoading ? "Verificando..." : "Acessar"}
+              {isLoading ? "Entrando..." : "Entrar"}
             </ThemedText>
           </TouchableOpacity>
 
           {/* Informações adicionais */}
           <View style={styles.infoContainer}>
             <ThemedText style={styles.infoText}>
-              Esqueceu o código? Entre em contato com o suporte.
+              Esqueceu sua senha? Entre em contato com o suporte.
             </ThemedText>
           </View>
         </View>
@@ -182,17 +182,6 @@ const styles = StyleSheet.create({
     paddingHorizontal: 40,
     paddingTop: 60,
   },
-  lockIconContainer: {
-    marginBottom: 40,
-  },
-  lockIcon: {
-    width: 120,
-    height: 120,
-    borderRadius: 60,
-    backgroundColor: AuthColors.primary,
-    justifyContent: "center",
-    alignItems: "center",
-  },
   textContainer: {
     alignItems: "center",
     marginBottom: 40,
@@ -211,22 +200,48 @@ const styles = StyleSheet.create({
     lineHeight: 22,
     paddingHorizontal: 20,
   },
-  codeContainer: {
-    flexDirection: "row",
-    gap: 12,
-    marginBottom: 40,
+  inputContainer: {
+    width: "100%",
+    marginBottom: 24,
   },
-  codeInput: {
-    width: 50,
-    height: 60,
+  inputLabel: {
+    fontSize: 16,
+    fontWeight: "600",
+    color: "#1a1a1a",
+    marginBottom: 8,
+  },
+  textInput: {
+    width: "100%",
+    height: 56,
     borderWidth: 2,
     borderColor: "#e0e0e0",
     borderRadius: 12,
-    textAlign: "center",
-    fontSize: 24,
-    fontWeight: "bold",
+    paddingHorizontal: 16,
+    fontSize: 16,
     color: "#1a1a1a",
     backgroundColor: "#f9fafb",
+  },
+  passwordContainer: {
+    position: "relative",
+    width: "100%",
+  },
+  passwordInput: {
+    width: "100%",
+    height: 56,
+    borderWidth: 2,
+    borderColor: "#e0e0e0",
+    borderRadius: 12,
+    paddingHorizontal: 16,
+    paddingRight: 56,
+    fontSize: 16,
+    color: "#1a1a1a",
+    backgroundColor: "#f9fafb",
+  },
+  eyeButton: {
+    position: "absolute",
+    right: 16,
+    top: 18,
+    padding: 4,
   },
   submitButton: {
     backgroundColor: AuthColors.primary,
@@ -243,6 +258,7 @@ const styles = StyleSheet.create({
     shadowRadius: 4,
     elevation: 3,
     minWidth: 200,
+    marginTop: 20,
   },
   disabledButton: {
     backgroundColor: "#e0e0e0",
