@@ -136,11 +136,11 @@ const styles = StyleSheet.create({
   button: {
     paddingVertical: 12,
     paddingHorizontal: 20,
-    borderRadius: 8,
+    borderRadius: 999,
     alignItems: "center",
   },
   primaryButton: {
-    backgroundColor: "#E31C79",
+    backgroundColor: "#28acac",
   },
   secondaryButton: {
     backgroundColor: "#6c757d",

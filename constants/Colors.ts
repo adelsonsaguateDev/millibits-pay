@@ -3,31 +3,31 @@
  * There are many other ways to style your app. For example, [Nativewind](https://www.nativewind.dev/), [Tamagui](https://tamagui.dev/), [unistyles](https://reactnativeunistyles.vercel.app), etc.
  */
 
-const tintColorLight = "#E31C79";
-const tintColorDark = "#fff";
+const tintColorLight = "#28acac";
+const tintColorDark = "#28acac";
 
 export const Colors = {
   light: {
-    text: "#11181C",
-    background: "#fff",
+    text: "#1a1a1a",
+    background: "#ffffff",
     tint: tintColorLight,
-    icon: "#687076",
-    tabIconDefault: "#687076",
+    icon: "#666666",
+    tabIconDefault: "#999999",
     tabIconSelected: tintColorLight,
   },
   dark: {
-    text: "#ECEDEE",
-    background: "#151718",
+    text: "#ffffff",
+    background: "#0a0a0a",
     tint: tintColorDark,
-    icon: "#9BA1A6",
-    tabIconDefault: "#9BA1A6",
+    icon: "#cccccc",
+    tabIconDefault: "#666666",
     tabIconSelected: tintColorDark,
   },
 };
 
 // Cores específicas para a tela de autenticação
 export const AuthColors = {
-  primary: "#E31C79", // Rosa vibrante
+  primary: "#28acac", // Teal primary color
   white: "#FFFFFF",
   shadow: "#000000",
 };

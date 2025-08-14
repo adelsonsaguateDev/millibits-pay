@@ -1,24 +1,29 @@
+import { MilleBitLogo } from "@/components/MilleBitLogo";
 import { ThemedText } from "@/components/ThemedText";
-import { ThemedView } from "@/components/ThemedView";
 import { Colors } from "@/constants/Colors";
 import { useAuth } from "@/hooks/useAuth";
+import { LinearGradient } from "expo-linear-gradient";
 import { StyleSheet, TouchableOpacity, View } from "react-native";
 
 export default function HomeScreen() {
   const { signOut } = useAuth();
 
   return (
-    <ThemedView style={styles.container}>
+    <LinearGradient
+      colors={[Colors.light.tint, Colors.light.background]}
+      locations={[0, 0.5]}
+      style={styles.container}
+    >
       {/* Header */}
       <View style={styles.header}>
-        <ThemedText style={styles.logo}>MILLEBITS</ThemedText>
+        <View style={styles.logoContainer}>
+          <ThemedText style={styles.logoText}>BitPay</ThemedText>
+          <MilleBitLogo width={40} color="white" />
+        </View>
         <TouchableOpacity style={styles.profileButton} onPress={signOut}>
           <View style={styles.profileIcon} />
         </TouchableOpacity>
       </View>
-
-      {/* Divider */}
-      <View style={styles.divider} />
 
       {/* Main Content Area */}
       <View style={styles.mainContent}>
@@ -106,14 +111,13 @@ export default function HomeScreen() {
           </View>
         </View>
       </TouchableOpacity>
-    </ThemedView>
+    </LinearGradient>
   );
 }
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: Colors.light.background,
   },
   header: {
     flexDirection: "row",
@@ -123,10 +127,15 @@ const styles = StyleSheet.create({
     paddingTop: 60,
     paddingBottom: 20,
   },
-  logo: {
+  logoContainer: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 4,
+  },
+  logoText: {
     fontSize: 24,
     fontWeight: "bold",
-    color: Colors.light.tint,
+    color: "white",
   },
   profileButton: {
     width: 40,
@@ -144,7 +153,7 @@ const styles = StyleSheet.create({
   },
   divider: {
     height: 1,
-    backgroundColor: "#E5E5E5",
+    backgroundColor: "#e0e0e0",
     marginHorizontal: 20,
   },
   mainContent: {
@@ -161,7 +170,7 @@ const styles = StyleSheet.create({
     borderRadius: 16,
     padding: 20,
     borderWidth: 2,
-    borderColor: "#e9ecef",
+    borderColor: "#e0e0e0",
     borderStyle: "dashed",
     justifyContent: "space-between",
     shadowColor: "#000",
@@ -178,7 +187,7 @@ const styles = StyleSheet.create({
   cardLogo: {
     width: 40,
     height: 24,
-    backgroundColor: "#dee2e6",
+    backgroundColor: "#e0e0e0",
     borderRadius: 4,
     justifyContent: "center",
     alignItems: "center",
@@ -186,12 +195,12 @@ const styles = StyleSheet.create({
   cardLogoText: {
     fontSize: 12,
     fontWeight: "bold",
-    color: "#6c757d",
+    color: "#666666",
   },
   cardChip: {
     width: 32,
     height: 24,
-    backgroundColor: "#dee2e6",
+    backgroundColor: "#e0e0e0",
     borderRadius: 4,
   },
   cardNumberContainer: {
@@ -207,7 +216,7 @@ const styles = StyleSheet.create({
   cardNumberDot: {
     width: 8,
     height: 8,
-    backgroundColor: "#dee2e6",
+    backgroundColor: "#e0e0e0",
     borderRadius: 4,
   },
   cardFooter: {
@@ -220,7 +229,7 @@ const styles = StyleSheet.create({
   },
   cardHolderLabel: {
     fontSize: 10,
-    color: "#6c757d",
+    color: "#666666",
     fontWeight: "600",
     marginBottom: 6,
     letterSpacing: 0.5,
@@ -232,7 +241,7 @@ const styles = StyleSheet.create({
   cardHolderDot: {
     width: 6,
     height: 6,
-    backgroundColor: "#dee2e6",
+    backgroundColor: "#e0e0e0",
     borderRadius: 3,
   },
   cardExpiryInfo: {

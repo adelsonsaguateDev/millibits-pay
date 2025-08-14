@@ -115,7 +115,7 @@ export default function RegisterCodeScreen() {
             text: "OK",
             onPress: () => {
               // Redirecionar para a tela principal
-              router.replace("/(tabs)");
+              router.replace("/(home)");
             },
           },
         ]);
@@ -290,13 +290,13 @@ const styles = StyleSheet.create({
   title: {
     fontSize: 24,
     fontWeight: "bold",
-    color: "#11181C",
+    color: "#1a1a1a",
     marginBottom: 12,
     textAlign: "center",
   },
   description: {
     fontSize: 16,
-    color: "#6C757D",
+    color: "#666666",
     textAlign: "center",
     lineHeight: 22,
     paddingHorizontal: 20,
@@ -308,7 +308,7 @@ const styles = StyleSheet.create({
   codeLabel: {
     fontSize: 16,
     fontWeight: "600",
-    color: "#11181C",
+    color: "#1a1a1a",
     marginBottom: 20,
   },
   codeContainer: {
@@ -319,19 +319,19 @@ const styles = StyleSheet.create({
     width: 50,
     height: 60,
     borderWidth: 2,
-    borderColor: "#E5E7EB",
+    borderColor: "#e0e0e0",
     borderRadius: 12,
     textAlign: "center",
     fontSize: 24,
     fontWeight: "bold",
-    color: "#11181C",
-    backgroundColor: "#F9FAFB",
+    color: "#1a1a1a",
+    backgroundColor: "#f9fafb",
   },
   submitButton: {
     backgroundColor: AuthColors.primary,
     paddingVertical: 16,
     paddingHorizontal: 32,
-    borderRadius: 12,
+    borderRadius: 999,
     alignItems: "center",
     shadowColor: AuthColors.shadow,
     shadowOffset: {
@@ -344,7 +344,7 @@ const styles = StyleSheet.create({
     minWidth: 200,
   },
   disabledButton: {
-    backgroundColor: "#E9ECEF",
+    backgroundColor: "#e0e0e0",
     shadowOpacity: 0,
     elevation: 0,
   },
@@ -359,7 +359,7 @@ const styles = StyleSheet.create({
   },
   infoText: {
     fontSize: 14,
-    color: "#6C757D",
+    color: "#666666",
     textAlign: "center",
     lineHeight: 20,
   },

@@ -120,7 +120,8 @@ export default function AuthScreen() {
       <ThemedView style={styles.container}>
         {/* Banner rosa no topo com logo Mille-bit */}
         <View style={styles.topBanner}>
-          <MilleBitLogo width={60} height={55} color="white" />
+          <ThemedText style={styles.logoText}>BitPay</ThemedText>
+          <MilleBitLogo width={60} height={55} color="white" variant="text" />
         </View>
 
         {/* Conteúdo principal */}
@@ -163,7 +164,8 @@ export default function AuthScreen() {
     <ThemedView style={styles.container}>
       {/* Banner rosa no topo com logo Mille-bit */}
       <View style={styles.topBanner}>
-        <MilleBitLogo width={60} height={55} color="white" />
+        <ThemedText style={styles.logoText}>BitPay</ThemedText>
+        <MilleBitLogo width={40} color="white" />
       </View>
 
       {/* Conteúdo principal */}
@@ -230,15 +232,16 @@ const styles = StyleSheet.create({
     backgroundColor: "white",
   },
   topBanner: {
+    flexDirection: "row",
     backgroundColor: AuthColors.primary,
     height: 120,
-    justifyContent: "center",
-    alignItems: "flex-start",
     paddingLeft: 30,
     paddingTop: 40,
+    alignItems: "center",
+    gap: 4,
   },
   logoText: {
-    fontSize: 48,
+    fontSize: 24,
     fontWeight: "bold",
     color: "white",
   },
@@ -268,12 +271,12 @@ const styles = StyleSheet.create({
     marginBottom: 30,
     paddingHorizontal: 20,
     paddingVertical: 10,
-    backgroundColor: "#F8F9FA",
+    backgroundColor: "#f8f9fa",
     borderRadius: 8,
   },
   biometricStatusText: {
     fontSize: 14,
-    color: "#6C757D",
+    color: "#666666",
     textAlign: "center",
   },
   buttonContainer: {
@@ -284,7 +287,7 @@ const styles = StyleSheet.create({
     backgroundColor: AuthColors.primary,
     paddingVertical: 16,
     paddingHorizontal: 24,
-    borderRadius: 12,
+    borderRadius: 999,
     alignItems: "center",
     shadowColor: AuthColors.shadow,
     shadowOffset: {
@@ -296,7 +299,7 @@ const styles = StyleSheet.create({
     elevation: 3,
   },
   disabledButton: {
-    backgroundColor: "#E9ECEF",
+    backgroundColor: "#e0e0e0",
     shadowOpacity: 0,
     elevation: 0,
   },
@@ -306,7 +309,7 @@ const styles = StyleSheet.create({
     fontWeight: "bold",
   },
   disabledButtonText: {
-    color: "#6C757D",
+    color: "#666666",
   },
   loadingContainer: {
     flexDirection: "row",
@@ -320,7 +323,7 @@ const styles = StyleSheet.create({
     backgroundColor: AuthColors.white,
     paddingVertical: 16,
     paddingHorizontal: 24,
-    borderRadius: 12,
+    borderRadius: 999,
     alignItems: "center",
     borderWidth: 2,
     borderColor: AuthColors.primary,
@@ -344,7 +347,7 @@ const styles = StyleSheet.create({
   },
   infoText: {
     fontSize: 14,
-    color: "#6C757D",
+    color: "#666666",
     textAlign: "center",
     lineHeight: 20,
   },
