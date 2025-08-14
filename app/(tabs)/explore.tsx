@@ -1,6 +1,7 @@
 import { Image } from 'expo-image';
 import { Platform, StyleSheet } from 'react-native';
 
+import { BiometricTest } from '@/components/BiometricTest';
 import { Collapsible } from '@/components/Collapsible';
 import { ExternalLink } from '@/components/ExternalLink';
 import ParallaxScrollView from '@/components/ParallaxScrollView';
@@ -24,6 +25,16 @@ export default function TabTwoScreen() {
         <ThemedText type="title">Explore</ThemedText>
       </ThemedView>
       <ThemedText>This app includes example code to help you get started.</ThemedText>
+      
+      <Collapsible title="🔐 Biometric Authentication Test">
+        <ThemedText>
+          Test the biometric authentication functionality. This component demonstrates:
+        </ThemedText>
+        <ThemedText>• Biometric availability checking</ThemedText>
+        <ThemedText>• Authentication testing</ThemedText>
+        <ThemedText>• Status monitoring</ThemedText>
+        <BiometricTest />
+      </Collapsible>
       <Collapsible title="File-based routing">
         <ThemedText>
           This app has two screens:{' '}
