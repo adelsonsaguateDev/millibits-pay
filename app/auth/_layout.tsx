@@ -6,7 +6,6 @@ export default function AuthLayout() {
       screenOptions={{
         headerShown: false,
         contentStyle: { backgroundColor: "white" },
-        animation: "slide_from_bottom",
         gestureEnabled: false,
       }}
     >
@@ -14,6 +13,18 @@ export default function AuthLayout() {
         name="index"
         options={{
           title: "Autenticação",
+        }}
+      />
+      <Stack.Screen
+        name="access-code"
+        options={{
+          title: "Código de Acesso",
+        }}
+      />
+      <Stack.Screen
+        name="register-code"
+        options={{
+          title: "Registrar Código",
         }}
       />
     </Stack>

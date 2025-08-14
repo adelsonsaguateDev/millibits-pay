@@ -1,4 +1,5 @@
 import { Ionicons } from "@expo/vector-icons";
+import { router } from "expo-router";
 import {
   ActivityIndicator,
   Alert,
@@ -15,12 +16,11 @@ import { useAuth } from "@/hooks/useAuth";
 import { useBiometrics } from "@/hooks/useBiometrics";
 
 export default function AuthScreen() {
-  const { signIn } = useAuth();
+  const { signIn, hasAccessCode, isFirstTime } = useAuth();
   const {
     isBiometricAvailable,
     biometricType,
     isAuthenticating,
-
     authenticate,
   } = useBiometrics();
 
@@ -75,9 +75,13 @@ export default function AuthScreen() {
   };
 
   const handleAccessCode = () => {
-    // Navegar para tela de código de acesso
-    console.log("Navegar para código de acesso");
-    // TODO: Implementar navegação para tela de código de acesso
+    // Se é a primeira vez ou não tem código configurado, vai para registro
+    if (isFirstTime || !hasAccessCode) {
+      router.push("/auth/register-code" as any);
+    } else {
+      // Se já tem código, vai para login
+      router.push("/auth/access-code");
+    }
   };
 
   const getBiometricButtonText = () => {
@@ -110,6 +114,51 @@ export default function AuthScreen() {
     return styles.biometricButtonText;
   };
 
+  // Se é a primeira vez, mostrar apenas o botão de código de acesso
+  if (isFirstTime) {
+    return (
+      <ThemedView style={styles.container}>
+        {/* Banner rosa no topo com logo Mille-bit */}
+        <View style={styles.topBanner}>
+          <MilleBitLogo width={60} height={55} color="white" />
+        </View>
+
+        {/* Conteúdo principal */}
+        <View style={styles.mainContent}>
+          {/* Ícone de usuário circular */}
+          <View style={styles.userIconContainer}>
+            <View style={styles.userIcon}>
+              <Ionicons name="person" size={60} color="white" />
+            </View>
+          </View>
+
+          {/* Título de boas-vindas */}
+          <View style={styles.welcomeContainer}>
+            <ThemedText style={styles.welcomeTitle}>
+              Bem-vindo ao MilleBits Pay!
+            </ThemedText>
+            <ThemedText style={styles.welcomeDescription}>
+              Configure seu código de acesso para começar a usar o app
+            </ThemedText>
+          </View>
+
+          {/* Botão de código de acesso */}
+          <View style={styles.buttonContainer}>
+            <TouchableOpacity
+              style={styles.accessCodeButton}
+              onPress={handleAccessCode}
+            >
+              <ThemedText style={styles.accessCodeButtonText}>
+                Configurar código de acesso
+              </ThemedText>
+            </TouchableOpacity>
+          </View>
+        </View>
+      </ThemedView>
+    );
+  }
+
+  // Tela normal com biometria e código de acesso
   return (
     <ThemedView style={styles.container}>
       {/* Banner rosa no topo com logo Mille-bit */}
@@ -125,17 +174,6 @@ export default function AuthScreen() {
             <Ionicons name="person" size={60} color="white" />
           </View>
         </View>
-
-        {/* Status da biometria */}
-        {isBiometricAvailable !== null && (
-          <View style={styles.biometricStatus}>
-            <ThemedText style={styles.biometricStatusText}>
-              {isBiometricAvailable
-                ? `✅ ${biometricType} disponível`
-                : "❌ Biometria não disponível"}
-            </ThemedText>
-          </View>
-        )}
 
         {/* Botões de autenticação */}
         <View style={styles.buttonContainer}>
@@ -205,10 +243,15 @@ const styles = StyleSheet.create({
     color: "white",
   },
   mainContent: {
-    flex: 1,
+    position: "absolute",
+    top: 0,
+    left: 0,
+    right: 0,
+    bottom: 0,
     justifyContent: "center",
     alignItems: "center",
     paddingHorizontal: 40,
+    paddingBottom: 40,
   },
   userIconContainer: {
     marginBottom: 40,
@@ -304,5 +347,23 @@ const styles = StyleSheet.create({
     color: "#6C757D",
     textAlign: "center",
     lineHeight: 20,
+  },
+  welcomeContainer: {
+    marginBottom: 40,
+    alignItems: "center",
+  },
+  welcomeTitle: {
+    fontSize: 28,
+    lineHeight: 32,
+    textAlign: "center",
+    fontWeight: "bold",
+    color: AuthColors.primary,
+    marginBottom: 10,
+  },
+  welcomeDescription: {
+    fontSize: 16,
+    color: "#6C757D",
+    textAlign: "center",
+    lineHeight: 22,
   },
 });
