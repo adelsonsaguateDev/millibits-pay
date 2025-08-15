@@ -186,6 +186,16 @@ export default function RegisterScreen() {
               </ThemedText>
             </TouchableOpacity>
 
+            {/* Link para login */}
+            <View style={styles.loginLinkContainer}>
+              <ThemedText style={styles.loginLinkText}>
+                Já tem conta?{" "}
+              </ThemedText>
+              <TouchableOpacity onPress={() => router.push("/auth/login")}>
+                <ThemedText style={styles.loginLinkButton}>Entrar</ThemedText>
+              </TouchableOpacity>
+            </View>
+
             {/* Informações adicionais */}
             <View style={styles.infoContainer}>
               <ThemedText style={styles.infoText}>
@@ -290,7 +300,7 @@ const styles = StyleSheet.create({
   eyeButton: {
     position: "absolute",
     right: 12,
-    top: 14,
+    top: 11,
     padding: 4,
   },
   logoText: {
@@ -335,6 +345,22 @@ const styles = StyleSheet.create({
     color: "#666666",
     textAlign: "center",
     lineHeight: 20,
+  },
+  loginLinkContainer: {
+    flexDirection: "row",
+    justifyContent: "center",
+    alignItems: "center",
+    marginTop: 20,
+    marginBottom: 10,
+  },
+  loginLinkText: {
+    fontSize: 14,
+    color: "#666666",
+  },
+  loginLinkButton: {
+    fontSize: 14,
+    color: AuthColors.primary,
+    fontWeight: "600",
   },
   keyboardAvoidingView: {
     flex: 1,

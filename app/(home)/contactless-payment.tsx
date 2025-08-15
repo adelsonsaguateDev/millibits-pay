@@ -86,7 +86,11 @@ export default function ContactlessPaymentScreen() {
         <View style={styles.headerSpacer} />
       </View>
 
-      <View style={styles.mainContent}>
+      <TouchableOpacity
+        style={styles.mainContent}
+        onPress={handlePaymentComplete}
+        activeOpacity={0.8}
+      >
         {/* Card Scanner Illustration */}
         <View style={styles.cardScannerContainer}>
           {/* Scanning circles */}
@@ -164,7 +168,7 @@ export default function ContactlessPaymentScreen() {
             À espera do cartão...
           </ThemedText>
         </View>
-      </View>
+      </TouchableOpacity>
     </LinearGradient>
   );
 }

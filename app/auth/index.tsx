@@ -35,7 +35,7 @@ export default function AuthIntroScreen() {
         {/* Título de boas-vindas */}
         <View style={styles.welcomeContainer}>
           <ThemedText style={styles.welcomeTitle}>
-            Bem-vindo ao MilleBits Pay!
+            Bem-vindo ao BitPay!
           </ThemedText>
           <ThemedText style={styles.welcomeDescription}>
             Escolha uma opção para continuar

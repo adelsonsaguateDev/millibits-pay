@@ -81,29 +81,6 @@ export default function SecurityScreen() {
             />
           )}
         </View>
-
-        <View style={styles.section}>
-          <ThemedText style={styles.sectionTitle}>Privacidade</ThemedText>
-          {renderSecurityItem(
-            "eye-off",
-            "Ocultar Saldo",
-            "Oculta o saldo dos cartões no ecrã inicial"
-          )}
-          {renderSecurityItem(
-            "lock-closed",
-            "Bloquear Aplicação",
-            "Bloqueia a aplicação quando não estiver em uso"
-          )}
-        </View>
-
-        <View style={styles.section}>
-          <ThemedText style={styles.sectionTitle}>Notificações</ThemedText>
-          {renderSecurityItem(
-            "notifications",
-            "Alertas de Segurança",
-            "Receba notificações sobre atividades suspeitas"
-          )}
-        </View>
       </ScrollView>
     </LinearGradient>
   );
@@ -162,7 +139,6 @@ const styles = StyleSheet.create({
     paddingVertical: 16,
     paddingHorizontal: 20,
     backgroundColor: "white",
-    marginHorizontal: 20,
     marginBottom: 1,
     borderRadius: 12,
   },

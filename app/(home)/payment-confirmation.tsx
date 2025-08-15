@@ -4,7 +4,6 @@ import MaterialIcons from "@expo/vector-icons/MaterialIcons";
 import { LinearGradient } from "expo-linear-gradient";
 import { useLocalSearchParams, useRouter } from "expo-router";
 import { StatusBar } from "expo-status-bar";
-import { useState } from "react";
 import {
   Alert,
   ScrollView,
@@ -22,14 +21,9 @@ export default function PaymentConfirmationScreen() {
   const amount = Array.isArray(params.amount)
     ? params.amount[0]
     : params.amount;
-  const merchant = Array.isArray(params.merchant)
-    ? params.merchant[0]
-    : params.merchant;
   const description = Array.isArray(params.description)
     ? params.description[0]
     : params.description;
-
-  const [isProcessing, setIsProcessing] = useState(false);
 
   // Mock transaction details
   const transactionDate = new Date().toLocaleDateString("pt-BR");
@@ -45,40 +39,15 @@ export default function PaymentConfirmationScreen() {
   const cardExpiry = "12/25";
 
   const handleConfirmPayment = async () => {
-    setIsProcessing(true);
-
-    try {
-      // Simulate payment processing
-      await new Promise((resolve) => setTimeout(resolve, 2000));
-
-      // Show success message
-      Alert.alert(
-        "Pagamento Confirmado!",
-        `Pagamento de €${parseFloat(amount || "0").toFixed(
-          2
-        )} realizado com sucesso para ${merchant || "Comerciante"}.`,
-        [
-          {
-            text: "OK",
-            onPress: () => {
-              // Navigate back to payment method screen
-              router.push("/(home)/payment-method");
-            },
-          },
-        ]
-      );
-    } catch (error) {
-      Alert.alert(
-        "Erro no Pagamento",
-        "Ocorreu um erro ao processar o pagamento. Tente novamente.",
-        [
-          {
-            text: "Tentar Novamente",
-            onPress: () => setIsProcessing(false),
-          },
-        ]
-      );
-    }
+    // Navigate to password confirmation screen
+    router.push({
+      pathname: "/(home)/payment-password-confirmation",
+      params: {
+        cardId,
+        amount,
+        description,
+      },
+    });
   };
 
   const handleCancel = () => {
@@ -148,20 +117,20 @@ export default function PaymentConfirmationScreen() {
               <View style={styles.summaryContent}>
                 <View style={styles.summaryRow}>
                   <ThemedText style={styles.summaryLabel}>
-                    Comerciante:
+                    Referência:
                   </ThemedText>
                   <ThemedText style={styles.summaryValue}>
-                    {merchant || "Comerciante"}
+                    {transactionRef}
                   </ThemedText>
                 </View>
 
                 <View style={styles.summaryRow}>
                   <ThemedText style={styles.summaryLabel}>Valor:</ThemedText>
                   <View style={styles.amountContainer}>
-                    <ThemedText style={styles.currencySymbol}>€</ThemedText>
                     <ThemedText style={styles.amountValue}>
-                      {parseFloat(amount || "0").toFixed(2)}
+                      {parseFloat(amount || "500").toFixed(2)}
                     </ThemedText>
+                    <ThemedText style={styles.currencySymbol}>MZN</ThemedText>
                   </View>
                 </View>
 
@@ -187,15 +156,6 @@ export default function PaymentConfirmationScreen() {
                   <ThemedText style={styles.summaryLabel}>Hora:</ThemedText>
                   <ThemedText style={styles.summaryValue}>
                     {transactionTime}
-                  </ThemedText>
-                </View>
-
-                <View style={styles.summaryRow}>
-                  <ThemedText style={styles.summaryLabel}>
-                    Referência:
-                  </ThemedText>
-                  <ThemedText style={styles.summaryValue}>
-                    {transactionRef}
                   </ThemedText>
                 </View>
               </View>
@@ -240,22 +200,6 @@ export default function PaymentConfirmationScreen() {
                     {cardHolder}
                   </ThemedText>
                 </View>
-
-                <View style={styles.cardInfoRow}>
-                  <ThemedText style={styles.cardInfoLabel}>
-                    Validade:
-                  </ThemedText>
-                  <ThemedText style={styles.cardInfoValue}>
-                    {cardExpiry}
-                  </ThemedText>
-                </View>
-
-                <View style={styles.cardInfoRow}>
-                  <ThemedText style={styles.cardInfoLabel}>Método:</ThemedText>
-                  <ThemedText style={styles.cardInfoValue}>
-                    {paymentMethod}
-                  </ThemedText>
-                </View>
               </View>
             </LinearGradient>
           </View>
@@ -277,36 +221,12 @@ export default function PaymentConfirmationScreen() {
         {/* Bottom Actions */}
         <View style={styles.bottomActions}>
           <TouchableOpacity
-            style={styles.cancelButton}
-            onPress={handleCancel}
-            disabled={isProcessing}
-          >
-            <ThemedText style={styles.cancelButtonText}>Cancelar</ThemedText>
-          </TouchableOpacity>
-
-          <TouchableOpacity
-            style={[
-              styles.confirmButton,
-              isProcessing && styles.confirmButtonDisabled,
-            ]}
+            style={styles.confirmButton}
             onPress={handleConfirmPayment}
-            disabled={isProcessing}
           >
-            {isProcessing ? (
-              <View style={styles.processingContainer}>
-                <MaterialIcons name="hourglass-empty" size={20} color="white" />
-                <ThemedText style={styles.confirmButtonText}>
-                  Processando...
-                </ThemedText>
-              </View>
-            ) : (
-              <View style={styles.confirmContainer}>
-                <MaterialIcons name="check-circle" size={20} color="white" />
-                <ThemedText style={styles.confirmButtonText}>
-                  Confirmar Pagamento
-                </ThemedText>
-              </View>
-            )}
+            <ThemedText style={styles.confirmButtonText}>
+              Confirmar Pagamento
+            </ThemedText>
           </TouchableOpacity>
         </View>
       </LinearGradient>
@@ -486,46 +406,42 @@ const styles = StyleSheet.create({
     paddingHorizontal: 20,
     paddingBottom: 40,
     gap: 16,
+    justifyContent: "center",
   },
   cancelButton: {
-    flex: 1,
     backgroundColor: "rgba(255, 255, 255, 0.2)",
     paddingVertical: 16,
     paddingHorizontal: 24,
-    borderRadius: 25,
-    borderWidth: 1,
+    borderRadius: 999,
+    borderWidth: 2,
     borderColor: "rgba(255, 255, 255, 0.3)",
     alignItems: "center",
+    minWidth: 120,
+    shadowColor: "#000000",
+    shadowOffset: {
+      width: 0,
+      height: 2,
+    },
+    shadowOpacity: 0.1,
+    shadowRadius: 4,
+    elevation: 3,
   },
   cancelButtonText: {
     color: "white",
-    fontSize: 16,
-    fontWeight: "600",
+    fontSize: 18,
+    fontWeight: "bold",
   },
   confirmButton: {
-    flex: 2,
-    backgroundColor: Colors.light.tint,
-    paddingVertical: 16,
-    paddingHorizontal: 24,
+    width: 200,
+    height: 50,
     borderRadius: 25,
+    backgroundColor: Colors.light.tint,
+    justifyContent: "center",
     alignItems: "center",
-  },
-  confirmButtonDisabled: {
-    backgroundColor: "rgba(227, 28, 121, 0.6)",
   },
   confirmButtonText: {
     color: "white",
     fontSize: 16,
     fontWeight: "600",
-  },
-  processingContainer: {
-    flexDirection: "row",
-    alignItems: "center",
-    gap: 8,
-  },
-  confirmContainer: {
-    flexDirection: "row",
-    alignItems: "center",
-    gap: 8,
   },
 });

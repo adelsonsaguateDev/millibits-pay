@@ -1,6 +1,7 @@
 import { ThemedText } from "@/components/ThemedText";
 import { Colors } from "@/constants/Colors";
 import { useCards } from "@/hooks/useCards";
+import { MaterialIcons } from "@expo/vector-icons";
 import { LinearGradient } from "expo-linear-gradient";
 import { useRouter } from "expo-router";
 import { useState } from "react";
@@ -86,7 +87,7 @@ export default function AddCardManualScreen() {
           style={styles.backButton}
           onPress={() => router.back()}
         >
-          <ThemedText style={styles.backArrow}>←</ThemedText>
+          <MaterialIcons name="arrow-back" size={24} color="white" />
         </TouchableOpacity>
         <ThemedText style={styles.headerTitle}>Adicionar Cartão</ThemedText>
         <View style={styles.headerSpacer} />

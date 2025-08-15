@@ -266,7 +266,7 @@ const styles = StyleSheet.create({
   eyeButton: {
     position: "absolute",
     right: 16,
-    top: 18,
+    top: 11,
     padding: 4,
   },
   submitButton: {
