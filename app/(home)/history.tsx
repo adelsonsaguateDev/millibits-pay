@@ -191,16 +191,6 @@ export default function HistoryScreen() {
             {transaction.type === "refund" ? "+" : "-"}MZN{" "}
             {transaction.amount.toFixed(2)}
           </ThemedText>
-          <View
-            style={[
-              styles.statusBadge,
-              { backgroundColor: getStatusColor(transaction.status) },
-            ]}
-          >
-            <ThemedText style={styles.statusText}>
-              {getStatusText(transaction.status)}
-            </ThemedText>
-          </View>
         </View>
       </View>
     </View>

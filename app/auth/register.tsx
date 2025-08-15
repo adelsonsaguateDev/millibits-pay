@@ -22,9 +22,9 @@ import { useAuth } from "@/hooks/useAuth";
 
 export default function RegisterScreen() {
   const { setCredentials } = useAuth();
-  const [username, setUsername] = useState("");
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
+  const [username, setUsername] = useState("millebit");
+  const [email, setEmail] = useState("millebit@exemplo.com");
+  const [password, setPassword] = useState("admin123");
   const [isLoading, setIsLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
 

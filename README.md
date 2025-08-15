@@ -4,6 +4,9 @@ Esta é uma aplicação de pagamentos desenvolvida com [Expo](https://expo.dev) 
 
 ## Sobre
 
+email@exemplo.com
+admin123
+
 Millibits Pay é uma aplicação móvel para gestão de cartões e pagamentos, desenvolvida especificamente para o mercado português. A aplicação utiliza português de Portugal (pt-PT) em toda a interface.
 
 ## Funcionalidades

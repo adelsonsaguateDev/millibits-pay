@@ -82,12 +82,9 @@ export class CardStorage {
 
   private static maskCardNumber(cardNumber: string): string {
     const cleaned = cardNumber.replace(/\s/g, "");
-    if (cleaned.length < 8) return cleaned;
+    if (cleaned.length < 4) return cleaned;
 
-    const firstFour = cleaned.slice(0, 4);
     const lastFour = cleaned.slice(-4);
-    const middle = "*".repeat(cleaned.length - 8);
-
-    return `${firstFour} ${middle} ${lastFour}`.trim();
+    return `**** **** **** ${lastFour}`;
   }
 }

@@ -89,7 +89,7 @@ export default function PaymentConfirmationScreen() {
       // Show success message
       Alert.alert(
         "Pagamento Confirmado!",
-        `Pagamento de 500 MZN realizado com sucesso usando biometria.`,
+        `Pagamento de 500 MZN realizado com sucesso.`,
         [
           {
             text: "OK",
