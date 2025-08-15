@@ -2,13 +2,14 @@ import { ThemedText } from "@/components/ThemedText";
 import { Colors } from "@/constants/Colors";
 import MaterialIcons from "@expo/vector-icons/build/MaterialIcons";
 import { LinearGradient } from "expo-linear-gradient";
-import { useRouter } from "expo-router";
+import { useLocalSearchParams, useRouter } from "expo-router";
 import { useEffect, useRef } from "react";
 import { Animated, StyleSheet, TouchableOpacity, View } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
-export default function AddCardScreen() {
+export default function ContactlessPaymentScreen() {
   const router = useRouter();
+  const { cardId } = useLocalSearchParams();
   const insets = useSafeAreaInsets();
   const pulseAnim = useRef(new Animated.Value(1)).current;
   const scanAnim = useRef(new Animated.Value(0)).current;
@@ -55,6 +56,16 @@ export default function AddCardScreen() {
     };
   }, [pulseAnim, scanAnim]);
 
+  const handlePaymentComplete = () => {
+    // TODO: Implement payment completion logic
+    console.log("Contactless payment completed for card:", cardId);
+    // Navigate to payment confirmation or back to payment method
+    router.push({
+      pathname: "/(home)/payment-confirmation",
+      params: { cardId, paymentMethod: "contactless" },
+    });
+  };
+
   return (
     <LinearGradient
       colors={[Colors.light.tint, Colors.light.background]}
@@ -69,11 +80,12 @@ export default function AddCardScreen() {
         >
           <MaterialIcons name="arrow-back" size={24} color="white" />
         </TouchableOpacity>
-        <ThemedText style={styles.headerTitle}>Aproxime o Cartão</ThemedText>
+        <ThemedText style={styles.headerTitle}>
+          Pagamento Contactless
+        </ThemedText>
         <View style={styles.headerSpacer} />
       </View>
 
-      {/* Main Content */}
       <View style={styles.mainContent}>
         {/* Card Scanner Illustration */}
         <View style={styles.cardScannerContainer}>
@@ -138,10 +150,10 @@ export default function AddCardScreen() {
 
         {/* Instructions */}
         <View style={styles.instructionsContainer}>
-          <ThemedText style={styles.scanningText}>Digitalizando...</ThemedText>
+          <ThemedText style={styles.scanningText}>Processando...</ThemedText>
           <ThemedText style={styles.instructionText}>
             Coloque e mova lentamente o cartão de crédito ou débito na parte de
-            trás do seu telemóvel.
+            trás do seu telemóvel para realizar o pagamento.
           </ThemedText>
         </View>
 
@@ -152,23 +164,6 @@ export default function AddCardScreen() {
             À espera do cartão...
           </ThemedText>
         </View>
-      </View>
-
-      {/* Bottom actions */}
-      <View
-        style={[
-          styles.bottomActions,
-          { paddingBottom: Math.max(30, insets.bottom) },
-        ]}
-      >
-        <TouchableOpacity
-          style={styles.manualButton}
-          onPress={() => router.push("/(home)/add-card-manual")}
-        >
-          <ThemedText style={styles.manualButtonText}>
-            Adicionar Manualmente
-          </ThemedText>
-        </TouchableOpacity>
       </View>
     </LinearGradient>
   );
@@ -331,7 +326,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: 20,
     paddingBottom: 30,
   },
-  manualButton: {
+  paymentButton: {
     width: 280,
     height: 50,
     borderRadius: 25,
@@ -339,7 +334,7 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     alignItems: "center",
   },
-  manualButtonText: {
+  paymentButtonText: {
     color: "white",
     fontSize: 16,
     fontWeight: "600",

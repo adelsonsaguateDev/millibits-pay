@@ -8,6 +8,7 @@ import { useEffect, useState } from "react";
 import {
   Alert,
   Dimensions,
+  Pressable,
   StyleSheet,
   TouchableOpacity,
   View,
@@ -30,9 +31,7 @@ export default function QRScannerScreen() {
     const checkExpoGo = async () => {
       try {
         // Try to import BarCodeScanner to see if it's available
-        const { BarCodeScanner } = await import("expo-barcode-scanner");
-        const { status } = await BarCodeScanner.requestPermissionsAsync();
-        setHasPermission(status === "granted");
+        setHasPermission(true);
       } catch (error) {
         console.log("BarCodeScanner not available, running in Expo Go");
         setIsExpoGo(true);
@@ -217,7 +216,7 @@ export default function QRScannerScreen() {
         </View>
 
         {/* Camera View */}
-        <View style={styles.cameraContainer}>
+        <Pressable style={styles.cameraContainer} onPress={handleManualInput}>
           {isExpoGo ? (
             // Expo Go fallback - show placeholder with instructions
             <View style={styles.expoGoPlaceholder}>
@@ -234,8 +233,7 @@ export default function QRScannerScreen() {
                 desenvolvimento personalizada.
               </ThemedText>
               <ThemedText style={styles.expoGoInstructions}>
-                Use o botão "Inserir Manualmente" para continuar com o
-                pagamento.
+                Toque aqui para inserir dados manualmente
               </ThemedText>
             </View>
           ) : (
@@ -265,37 +263,12 @@ export default function QRScannerScreen() {
             <View style={styles.instructionsContainer}>
               <ThemedText style={styles.instructionsText}>
                 {isExpoGo
-                  ? "Use o botão abaixo para inserir dados manualmente"
+                  ? "Toque aqui para inserir dados manualmente"
                   : "Posicione o código QR dentro da área de digitalização"}
               </ThemedText>
             </View>
           </View>
-        </View>
-
-        {/* Bottom Actions */}
-        <View style={styles.bottomActions}>
-          <TouchableOpacity
-            style={styles.manualButton}
-            onPress={handleManualInput}
-          >
-            <MaterialIcons name="edit" size={20} color={Colors.light.tint} />
-            <ThemedText style={styles.manualButtonText}>
-              Inserir Manualmente
-            </ThemedText>
-          </TouchableOpacity>
-
-          {scanned && (
-            <TouchableOpacity
-              style={styles.scanAgainButton}
-              onPress={() => setScanned(false)}
-            >
-              <MaterialIcons name="refresh" size={20} color="white" />
-              <ThemedText style={styles.scanAgainButtonText}>
-                Digitalizar Novamente
-              </ThemedText>
-            </TouchableOpacity>
-          )}
-        </View>
+        </Pressable>
       </LinearGradient>
     </>
   );

@@ -6,8 +6,17 @@ import { useCards } from "@/hooks/useCards";
 import MaterialIcons from "@expo/vector-icons/MaterialIcons";
 import { LinearGradient } from "expo-linear-gradient";
 import { useRouter } from "expo-router";
-import { ScrollView, StyleSheet, TouchableOpacity, View } from "react-native";
-import { useSafeAreaInsets } from "react-native-safe-area-context";
+import {
+  Platform,
+  ScrollView,
+  StyleSheet,
+  TouchableOpacity,
+  View,
+} from "react-native";
+import {
+  SafeAreaView,
+  useSafeAreaInsets,
+} from "react-native-safe-area-context";
 
 export default function HomeScreen() {
   const { signOut } = useAuth();
@@ -135,62 +144,127 @@ export default function HomeScreen() {
       locations={[0, 0.5]}
       style={styles.container}
     >
-      {/* Header */}
-      <View style={styles.header}>
-        <View style={styles.logoContainer}>
-          <MilleBitLogo width={40} color="white" />
-          <ThemedText style={styles.logoText}>BitPay</ThemedText>
-        </View>
-        <View style={styles.profileContainer}>
-          <TouchableOpacity
-            style={styles.profileButton}
-            onPress={() => router.push("/(home)/settings" as any)}
-            accessibilityLabel="Open settings"
-          >
-            <MaterialIcons name="settings" size={24} color="white" />
-          </TouchableOpacity>
-        </View>
-      </View>
-
-      {/* Main Content Area */}
-      <View style={styles.mainContent}>
-        {!loading && cards.length > 0 ? (
-          <ScrollView
-            style={styles.cardsContainer}
-            contentContainerStyle={styles.cardsContent}
-            showsVerticalScrollIndicator={false}
-          >
-            {cards.map(renderCard)}
-          </ScrollView>
-        ) : (
-          <>
-            {renderCardPlaceholder()}
-            {/* Add Card Hint */}
-            <View style={styles.addCardHint}>
-              <ThemedText style={styles.hintText}>
-                Toque no botão flutuante para adicionar o seu primeiro cartão
-              </ThemedText>
+      {Platform.OS === "android" ? (
+        <SafeAreaView style={{ flex: 1 }}>
+          {/* Header */}
+          <View style={styles.header}>
+            <View style={styles.logoContainer}>
+              <MilleBitLogo width={40} color="white" />
+              <ThemedText style={styles.logoText}>BitPay</ThemedText>
             </View>
-          </>
-        )}
-      </View>
-
-      {/* Floating Action Button */}
-      <TouchableOpacity
-        style={[styles.floatingButton, { bottom: 30 + insets.bottom }]}
-        onPress={() => router.push("/(home)/add-card" as any)}
-      >
-        <View style={styles.floatingButtonContent}>
-          <ThemedText style={styles.floatingButtonLabel}>
-            {cards.length > 0
-              ? "Adicionar outro cartão"
-              : "Associar cartão à carteira"}
-          </ThemedText>
-          <View style={styles.floatingButtonIcon}>
-            <ThemedText style={styles.floatingButtonArrow}>+</ThemedText>
+            <View style={styles.profileContainer}>
+              <TouchableOpacity
+                style={styles.profileButton}
+                onPress={() => router.push("/(home)/settings" as any)}
+                accessibilityLabel="Open settings"
+              >
+                <MaterialIcons name="settings" size={24} color="white" />
+              </TouchableOpacity>
+            </View>
           </View>
-        </View>
-      </TouchableOpacity>
+
+          {/* Main Content Area */}
+          <View style={styles.mainContent}>
+            {!loading && cards.length > 0 ? (
+              <ScrollView
+                style={styles.cardsContainer}
+                contentContainerStyle={styles.cardsContent}
+                showsVerticalScrollIndicator={false}
+              >
+                {cards.map(renderCard)}
+              </ScrollView>
+            ) : (
+              <>
+                {renderCardPlaceholder()}
+                {/* Add Card Hint */}
+                <View style={styles.addCardHint}>
+                  <ThemedText style={styles.hintText}>
+                    Toque no botão flutuante para adicionar o seu primeiro
+                    cartão
+                  </ThemedText>
+                </View>
+              </>
+            )}
+          </View>
+
+          {/* Floating Action Button */}
+          <TouchableOpacity
+            style={[styles.floatingButton, { bottom: insets.bottom }]}
+            onPress={() => router.push("/(home)/add-card" as any)}
+          >
+            <View style={styles.floatingButtonContent}>
+              <ThemedText style={styles.floatingButtonLabel}>
+                {cards.length > 0
+                  ? "Adicionar outro cartão"
+                  : "Associar cartão à carteira"}
+              </ThemedText>
+              <View style={styles.floatingButtonIcon}>
+                <ThemedText style={styles.floatingButtonArrow}>+</ThemedText>
+              </View>
+            </View>
+          </TouchableOpacity>
+        </SafeAreaView>
+      ) : (
+        <>
+          {/* Header */}
+          <View style={styles.header}>
+            <View style={styles.logoContainer}>
+              <MilleBitLogo width={40} color="white" />
+              <ThemedText style={styles.logoText}>BitPay</ThemedText>
+            </View>
+            <View style={styles.profileContainer}>
+              <TouchableOpacity
+                style={styles.profileButton}
+                onPress={() => router.push("/(home)/settings" as any)}
+                accessibilityLabel="Open settings"
+              >
+                <MaterialIcons name="settings" size={24} color="white" />
+              </TouchableOpacity>
+            </View>
+          </View>
+
+          {/* Main Content Area */}
+          <View style={styles.mainContent}>
+            {!loading && cards.length > 0 ? (
+              <ScrollView
+                style={styles.cardsContainer}
+                contentContainerStyle={styles.cardsContent}
+                showsVerticalScrollIndicator={false}
+              >
+                {cards.map(renderCard)}
+              </ScrollView>
+            ) : (
+              <>
+                {renderCardPlaceholder()}
+                {/* Add Card Hint */}
+                <View style={styles.addCardHint}>
+                  <ThemedText style={styles.hintText}>
+                    Toque no botão flutuante para adicionar o seu primeiro
+                    cartão
+                  </ThemedText>
+                </View>
+              </>
+            )}
+          </View>
+
+          {/* Floating Action Button */}
+          <TouchableOpacity
+            style={[styles.floatingButton, { bottom: insets.bottom }]}
+            onPress={() => router.push("/(home)/add-card" as any)}
+          >
+            <View style={styles.floatingButtonContent}>
+              <ThemedText style={styles.floatingButtonLabel}>
+                {cards.length > 0
+                  ? "Adicionar outro cartão"
+                  : "Associar cartão à carteira"}
+              </ThemedText>
+              <View style={styles.floatingButtonIcon}>
+                <ThemedText style={styles.floatingButtonArrow}>+</ThemedText>
+              </View>
+            </View>
+          </TouchableOpacity>
+        </>
+      )}
     </LinearGradient>
   );
 }
@@ -440,7 +514,6 @@ const styles = StyleSheet.create({
   },
   floatingButton: {
     position: "absolute",
-    bottom: 30,
     right: 20,
     zIndex: 10,
   },

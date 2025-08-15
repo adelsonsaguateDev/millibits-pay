@@ -9,7 +9,6 @@ import {
   Alert,
   ScrollView,
   StyleSheet,
-  TextInput,
   TouchableOpacity,
   View,
 } from "react-native";
@@ -29,31 +28,23 @@ export default function PaymentConfirmationScreen() {
   const description = Array.isArray(params.description)
     ? params.description[0]
     : params.description;
-  const qrData = Array.isArray(params.qrData)
-    ? params.qrData[0]
-    : params.qrData;
 
-  const [paymentAmount, setPaymentAmount] = useState(amount || "0");
-  const [paymentMerchant, setPaymentMerchant] = useState(merchant || "");
-  const [paymentDescription, setPaymentDescription] = useState(
-    description || ""
-  );
   const [isProcessing, setIsProcessing] = useState(false);
 
+  // Mock transaction details
+  const transactionDate = new Date().toLocaleDateString("pt-BR");
+  const transactionTime = new Date().toLocaleTimeString("pt-BR", {
+    hour: "2-digit",
+    minute: "2-digit",
+  });
+  const transactionRef = `TXN${Date.now().toString().slice(-8)}`;
+  const paymentMethod = "Cartão de Crédito";
+  const cardType = "Visa";
+  const cardLast4 = cardId?.slice(-4) || "1234";
+  const cardHolder = "João Silva";
+  const cardExpiry = "12/25";
+
   const handleConfirmPayment = async () => {
-    if (!paymentAmount || parseFloat(paymentAmount) <= 0) {
-      Alert.alert(
-        "Erro",
-        "Por favor, insira um valor válido para o pagamento."
-      );
-      return;
-    }
-
-    if (!paymentMerchant.trim()) {
-      Alert.alert("Erro", "Por favor, insira o nome do comerciante.");
-      return;
-    }
-
     setIsProcessing(true);
 
     try {
@@ -63,9 +54,9 @@ export default function PaymentConfirmationScreen() {
       // Show success message
       Alert.alert(
         "Pagamento Confirmado!",
-        `Pagamento de €${parseFloat(paymentAmount).toFixed(
+        `Pagamento de €${parseFloat(amount || "0").toFixed(
           2
-        )} realizado com sucesso para ${paymentMerchant}.`,
+        )} realizado com sucesso para ${merchant || "Comerciante"}.`,
         [
           {
             text: "OK",
@@ -159,52 +150,54 @@ export default function PaymentConfirmationScreen() {
                   <ThemedText style={styles.summaryLabel}>
                     Comerciante:
                   </ThemedText>
-                  <TextInput
-                    style={styles.summaryInput}
-                    value={paymentMerchant}
-                    onChangeText={setPaymentMerchant}
-                    placeholder="Nome do comerciante"
-                    placeholderTextColor="#999"
-                  />
+                  <ThemedText style={styles.summaryValue}>
+                    {merchant || "Comerciante"}
+                  </ThemedText>
                 </View>
 
                 <View style={styles.summaryRow}>
                   <ThemedText style={styles.summaryLabel}>Valor:</ThemedText>
                   <View style={styles.amountContainer}>
                     <ThemedText style={styles.currencySymbol}>€</ThemedText>
-                    <TextInput
-                      style={styles.amountInput}
-                      value={paymentAmount}
-                      onChangeText={setPaymentAmount}
-                      placeholder="0.00"
-                      placeholderTextColor="#999"
-                      keyboardType="numeric"
-                    />
+                    <ThemedText style={styles.amountValue}>
+                      {parseFloat(amount || "0").toFixed(2)}
+                    </ThemedText>
                   </View>
+                </View>
+
+                {description && (
+                  <View style={styles.summaryRow}>
+                    <ThemedText style={styles.summaryLabel}>
+                      Descrição:
+                    </ThemedText>
+                    <ThemedText style={styles.summaryValue}>
+                      {description}
+                    </ThemedText>
+                  </View>
+                )}
+
+                <View style={styles.summaryRow}>
+                  <ThemedText style={styles.summaryLabel}>Data:</ThemedText>
+                  <ThemedText style={styles.summaryValue}>
+                    {transactionDate}
+                  </ThemedText>
+                </View>
+
+                <View style={styles.summaryRow}>
+                  <ThemedText style={styles.summaryLabel}>Hora:</ThemedText>
+                  <ThemedText style={styles.summaryValue}>
+                    {transactionTime}
+                  </ThemedText>
                 </View>
 
                 <View style={styles.summaryRow}>
                   <ThemedText style={styles.summaryLabel}>
-                    Descrição:
+                    Referência:
                   </ThemedText>
-                  <TextInput
-                    style={styles.summaryInput}
-                    value={paymentDescription}
-                    onChangeText={setPaymentDescription}
-                    placeholder="Descrição do pagamento"
-                    placeholderTextColor="#999"
-                    multiline
-                  />
+                  <ThemedText style={styles.summaryValue}>
+                    {transactionRef}
+                  </ThemedText>
                 </View>
-
-                {qrData && (
-                  <View style={styles.summaryRow}>
-                    <ThemedText style={styles.summaryLabel}>
-                      QR Data:
-                    </ThemedText>
-                    <ThemedText style={styles.qrDataText}>{qrData}</ThemedText>
-                  </View>
-                )}
               </View>
             </LinearGradient>
           </View>
@@ -222,52 +215,46 @@ export default function PaymentConfirmationScreen() {
                   color={Colors.light.tint}
                 />
                 <ThemedText style={styles.cardInfoTitle}>
-                  Cartão Selecionado
+                  Informações do Cartão
                 </ThemedText>
               </View>
 
               <View style={styles.cardInfoContent}>
-                <View style={styles.cardPreview}>
-                  <LinearGradient
-                    colors={[Colors.light.tint, "#C41E6B"]}
-                    start={{ x: 0, y: 0 }}
-                    end={{ x: 1, y: 1 }}
-                    style={styles.cardPreviewGradient}
-                  >
-                    <View style={styles.cardPreviewHeader}>
-                      <View style={styles.cardPreviewLogo}>
-                        <ThemedText style={styles.cardPreviewLogoText}>
-                          MB
-                        </ThemedText>
-                      </View>
-                      <View style={styles.cardPreviewChip} />
-                    </View>
+                <View style={styles.cardInfoRow}>
+                  <ThemedText style={styles.cardInfoLabel}>Tipo:</ThemedText>
+                  <ThemedText style={styles.cardInfoValue}>
+                    {cardType}
+                  </ThemedText>
+                </View>
 
-                    <View style={styles.cardPreviewNumber}>
-                      <ThemedText style={styles.cardPreviewNumberText}>
-                        •••• •••• •••• {cardId?.slice(-4) || "1234"}
-                      </ThemedText>
-                    </View>
+                <View style={styles.cardInfoRow}>
+                  <ThemedText style={styles.cardInfoLabel}>Número:</ThemedText>
+                  <ThemedText style={styles.cardInfoValue}>
+                    •••• •••• •••• {cardLast4}
+                  </ThemedText>
+                </View>
 
-                    <View style={styles.cardPreviewFooter}>
-                      <View style={styles.cardPreviewHolder}>
-                        <ThemedText style={styles.cardPreviewHolderLabel}>
-                          TITULAR
-                        </ThemedText>
-                        <ThemedText style={styles.cardPreviewHolderName}>
-                          CARTÃO
-                        </ThemedText>
-                      </View>
-                      <View style={styles.cardPreviewExpiry}>
-                        <ThemedText style={styles.cardPreviewExpiryLabel}>
-                          VÁLIDO ATÉ
-                        </ThemedText>
-                        <ThemedText style={styles.cardPreviewExpiryDate}>
-                          12/25
-                        </ThemedText>
-                      </View>
-                    </View>
-                  </LinearGradient>
+                <View style={styles.cardInfoRow}>
+                  <ThemedText style={styles.cardInfoLabel}>Titular:</ThemedText>
+                  <ThemedText style={styles.cardInfoValue}>
+                    {cardHolder}
+                  </ThemedText>
+                </View>
+
+                <View style={styles.cardInfoRow}>
+                  <ThemedText style={styles.cardInfoLabel}>
+                    Validade:
+                  </ThemedText>
+                  <ThemedText style={styles.cardInfoValue}>
+                    {cardExpiry}
+                  </ThemedText>
+                </View>
+
+                <View style={styles.cardInfoRow}>
+                  <ThemedText style={styles.cardInfoLabel}>Método:</ThemedText>
+                  <ThemedText style={styles.cardInfoValue}>
+                    {paymentMethod}
+                  </ThemedText>
                 </View>
               </View>
             </LinearGradient>
@@ -405,17 +392,12 @@ const styles = StyleSheet.create({
     color: "#666",
     minWidth: 100,
   },
-  summaryInput: {
-    flex: 1,
+  summaryValue: {
     fontSize: 16,
+    fontWeight: "600",
     color: "#1a1a1a",
     textAlign: "right",
-    paddingVertical: 8,
-    paddingHorizontal: 12,
-    backgroundColor: "rgba(227, 28, 121, 0.05)",
-    borderRadius: 8,
-    borderWidth: 1,
-    borderColor: "rgba(227, 28, 121, 0.2)",
+    flex: 1,
   },
   amountContainer: {
     flexDirection: "row",
@@ -427,27 +409,12 @@ const styles = StyleSheet.create({
     fontWeight: "700",
     color: "#1a1a1a",
   },
-  amountInput: {
+  amountValue: {
     fontSize: 18,
     fontWeight: "700",
     color: "#1a1a1a",
     textAlign: "right",
-    paddingVertical: 8,
-    paddingHorizontal: 12,
-    backgroundColor: "rgba(227, 28, 121, 0.05)",
-    borderRadius: 8,
-    borderWidth: 1,
-    borderColor: "rgba(227, 28, 121, 0.2)",
     minWidth: 80,
-  },
-  qrDataText: {
-    fontSize: 14,
-    color: "#666",
-    fontFamily: "monospace",
-    backgroundColor: "rgba(0, 0, 0, 0.05)",
-    padding: 8,
-    borderRadius: 6,
-    maxWidth: 150,
   },
 
   // Card Info Card Styles
@@ -476,92 +443,25 @@ const styles = StyleSheet.create({
     color: "#1a1a1a",
   },
   cardInfoContent: {
-    alignItems: "center",
+    gap: 16,
   },
-  cardPreview: {
-    width: "100%",
-    maxWidth: 300,
-    borderRadius: 16,
-    shadowColor: "#000",
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.2,
-    shadowRadius: 8,
-    elevation: 6,
-  },
-  cardPreviewGradient: {
-    borderRadius: 16,
-    padding: 20,
-    minHeight: 160,
-    justifyContent: "space-between",
-  },
-  cardPreviewHeader: {
+  cardInfoRow: {
     flexDirection: "row",
+    alignItems: "center",
     justifyContent: "space-between",
-    alignItems: "center",
   },
-  cardPreviewLogo: {
-    width: 40,
-    height: 28,
-    backgroundColor: "rgba(255, 255, 255, 0.2)",
-    borderRadius: 6,
-    justifyContent: "center",
-    alignItems: "center",
-  },
-  cardPreviewLogoText: {
-    fontSize: 12,
-    fontWeight: "bold",
-    color: "white",
-  },
-  cardPreviewChip: {
-    width: 32,
-    height: 26,
-    backgroundColor: "#ffd700",
-    borderRadius: 4,
-  },
-  cardPreviewNumber: {
-    alignItems: "center",
-    marginVertical: 16,
-  },
-  cardPreviewNumberText: {
-    color: "white",
-    fontSize: 18,
-    fontWeight: "bold",
-    letterSpacing: 2,
-  },
-  cardPreviewFooter: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    alignItems: "flex-end",
-  },
-  cardPreviewHolder: {
-    alignItems: "flex-start",
-  },
-  cardPreviewHolderLabel: {
-    fontSize: 8,
-    color: "rgba(255, 255, 255, 0.7)",
+  cardInfoLabel: {
+    fontSize: 16,
     fontWeight: "600",
-    marginBottom: 2,
-    letterSpacing: 0.5,
+    color: "#666",
+    minWidth: 100,
   },
-  cardPreviewHolderName: {
-    color: "white",
-    fontSize: 10,
+  cardInfoValue: {
+    fontSize: 16,
     fontWeight: "600",
-  },
-  cardPreviewExpiry: {
-    alignItems: "flex-end",
-  },
-  cardPreviewExpiryLabel: {
-    fontSize: 8,
-    color: "rgba(255, 255, 255, 0.7)",
-    fontWeight: "600",
-    marginBottom: 2,
-    letterSpacing: 0.5,
-  },
-  cardPreviewExpiryDate: {
-    color: "white",
-    fontSize: 10,
-    fontWeight: "600",
+    color: "#1a1a1a",
+    textAlign: "right",
+    flex: 1,
   },
 
   // Security Notice

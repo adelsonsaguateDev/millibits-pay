@@ -44,8 +44,8 @@ export default function AddCardManualScreen() {
       Alert.alert("Erro", "A data de validade é obrigatória");
       return false;
     }
-    if (!cvv.match(/^\d{3,4}$/)) {
-      Alert.alert("Erro", "O CVV deve ter 3 ou 4 dígitos");
+    if (!cvv.match(/^\d{3}$/)) {
+      Alert.alert("Erro", "O CVV deve ter 3 dígitos");
       return false;
     }
     return true;
@@ -204,10 +204,15 @@ export default function AddCardManualScreen() {
                 <TextInput
                   style={styles.textInput}
                   value={cvv}
-                  onChangeText={(text) => setCvv(text.replace(/\D/g, ""))}
+                  onChangeText={(text) => {
+                    const cleaned = text.replace(/\D/g, "");
+                    if (cleaned.length <= 3) {
+                      setCvv(cleaned);
+                    }
+                  }}
                   placeholder="123"
                   placeholderTextColor="#999"
-                  maxLength={4}
+                  maxLength={3}
                   keyboardType="numeric"
                 />
               </View>

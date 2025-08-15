@@ -4,6 +4,9 @@ import React, { useState } from "react";
 import {
   Alert,
   Keyboard,
+  KeyboardAvoidingView,
+  Platform,
+  ScrollView,
   StyleSheet,
   TextInput,
   TouchableOpacity,
@@ -95,91 +98,102 @@ export default function RegisterScreen() {
           </View>
         </View>
 
-        {/* Conteúdo principal */}
-        <View style={styles.mainContent}>
-          {/* Título e descrição */}
-          <View style={styles.textContainer}>
-            <ThemedText style={styles.title}>Criar conta</ThemedText>
-            <ThemedText style={styles.description}>
-              Configure seu email e senha para começar a usar o app
-            </ThemedText>
-          </View>
+        {/* Conteúdo principal com KeyboardAvoidingView */}
+        <KeyboardAvoidingView
+          style={styles.keyboardAvoidingView}
+          behavior={Platform.OS === "ios" ? "padding" : "height"}
+          keyboardVerticalOffset={Platform.OS === "ios" ? 0 : 20}
+        >
+          <ScrollView
+            style={styles.scrollView}
+            contentContainerStyle={styles.scrollContent}
+            showsVerticalScrollIndicator={false}
+            keyboardShouldPersistTaps="handled"
+          >
+            {/* Título e descrição */}
+            <View style={styles.textContainer}>
+              <ThemedText style={styles.title}>Criar conta</ThemedText>
+              <ThemedText style={styles.description}>
+                Configure seu email e senha para começar a usar o app
+              </ThemedText>
+            </View>
 
-          {/* Campo de username */}
-          <View style={styles.inputContainer}>
-            <ThemedText style={styles.inputLabel}>Nome de usuário</ThemedText>
-            <TextInput
-              style={styles.textInput}
-              value={username}
-              onChangeText={setUsername}
-              placeholder="Seu nome de usuário"
-              placeholderTextColor="#D1D5DB"
-              autoCapitalize="words"
-              autoCorrect={false}
-              selectionColor={AuthColors.primary}
-            />
-          </View>
-
-          {/* Campo de email */}
-          <View style={styles.inputContainer}>
-            <ThemedText style={styles.inputLabel}>Email</ThemedText>
-            <TextInput
-              style={styles.textInput}
-              value={email}
-              onChangeText={setEmail}
-              placeholder="seu@email.com"
-              placeholderTextColor="#D1D5DB"
-              keyboardType="email-address"
-              autoCapitalize="none"
-              autoCorrect={false}
-              selectionColor={AuthColors.primary}
-            />
-          </View>
-
-          {/* Campo de senha */}
-          <View style={styles.inputContainer}>
-            <ThemedText style={styles.inputLabel}>Senha</ThemedText>
-            <View style={styles.passwordContainer}>
+            {/* Campo de username */}
+            <View style={styles.inputContainer}>
+              <ThemedText style={styles.inputLabel}>Nome de usuário</ThemedText>
               <TextInput
-                style={styles.passwordInput}
-                value={password}
-                onChangeText={setPassword}
-                placeholder="Sua senha (mín. 6 caracteres)"
+                style={styles.textInput}
+                value={username}
+                onChangeText={setUsername}
+                placeholder="Seu nome de usuário"
                 placeholderTextColor="#D1D5DB"
-                secureTextEntry={!showPassword}
+                autoCapitalize="words"
+                autoCorrect={false}
                 selectionColor={AuthColors.primary}
               />
-              <TouchableOpacity
-                style={styles.eyeButton}
-                onPress={() => setShowPassword(!showPassword)}
-              >
-                <Ionicons
-                  name={showPassword ? "eye-off" : "eye"}
-                  size={20}
-                  color="#666666"
-                />
-              </TouchableOpacity>
             </View>
-          </View>
 
-          {/* Botão de envio */}
-          <TouchableOpacity
-            style={[styles.submitButton, !canSubmit && styles.disabledButton]}
-            onPress={handleSubmit}
-            disabled={!canSubmit || isLoading}
-          >
-            <ThemedText style={styles.submitButtonText}>
-              {isLoading ? "Criando conta..." : "Criar conta"}
-            </ThemedText>
-          </TouchableOpacity>
+            {/* Campo de email */}
+            <View style={styles.inputContainer}>
+              <ThemedText style={styles.inputLabel}>Email</ThemedText>
+              <TextInput
+                style={styles.textInput}
+                value={email}
+                onChangeText={setEmail}
+                placeholder="seu@email.com"
+                placeholderTextColor="#D1D5DB"
+                keyboardType="email-address"
+                autoCapitalize="none"
+                autoCorrect={false}
+                selectionColor={AuthColors.primary}
+              />
+            </View>
 
-          {/* Informações adicionais */}
-          <View style={styles.infoContainer}>
-            <ThemedText style={styles.infoText}>
-              Suas informações estão seguras e não serão compartilhadas.
-            </ThemedText>
-          </View>
-        </View>
+            {/* Campo de senha */}
+            <View style={styles.inputContainer}>
+              <ThemedText style={styles.inputLabel}>Senha</ThemedText>
+              <View style={styles.passwordContainer}>
+                <TextInput
+                  style={styles.passwordInput}
+                  value={password}
+                  onChangeText={setPassword}
+                  placeholder="Sua senha (mín. 6 caracteres)"
+                  placeholderTextColor="#D1D5DB"
+                  secureTextEntry={!showPassword}
+                  selectionColor={AuthColors.primary}
+                />
+                <TouchableOpacity
+                  style={styles.eyeButton}
+                  onPress={() => setShowPassword(!showPassword)}
+                >
+                  <Ionicons
+                    name={showPassword ? "eye-off" : "eye"}
+                    size={20}
+                    color="#666666"
+                  />
+                </TouchableOpacity>
+              </View>
+            </View>
+
+            {/* Botão de envio */}
+            <TouchableOpacity
+              style={[styles.submitButton, !canSubmit && styles.disabledButton]}
+              onPress={handleSubmit}
+              disabled={!canSubmit || isLoading}
+            >
+              <ThemedText style={styles.submitButtonText}>
+                {isLoading ? "Criando conta..." : "Criar conta"}
+              </ThemedText>
+            </TouchableOpacity>
+
+            {/* Informações adicionais */}
+            <View style={styles.infoContainer}>
+              <ThemedText style={styles.infoText}>
+                Suas informações estão seguras e não serão compartilhadas.
+              </ThemedText>
+            </View>
+          </ScrollView>
+        </KeyboardAvoidingView>
       </ThemedView>
     </TouchableWithoutFeedback>
   );
@@ -210,11 +224,13 @@ const styles = StyleSheet.create({
     top: 64,
     zIndex: 1,
   },
-  mainContent: {
-    flex: 1,
+  scrollContent: {
+    flexGrow: 1,
+    justifyContent: "center",
     alignItems: "center",
     paddingHorizontal: 32,
     paddingTop: 40,
+    paddingBottom: 40,
   },
   textContainer: {
     alignItems: "center",
@@ -319,5 +335,11 @@ const styles = StyleSheet.create({
     color: "#666666",
     textAlign: "center",
     lineHeight: 20,
+  },
+  keyboardAvoidingView: {
+    flex: 1,
+  },
+  scrollView: {
+    flex: 1,
   },
 });

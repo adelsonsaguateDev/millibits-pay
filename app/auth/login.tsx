@@ -8,6 +8,9 @@ import { router } from "expo-router";
 import { useState } from "react";
 import {
   Alert,
+  KeyboardAvoidingView,
+  Platform,
+  ScrollView,
   StyleSheet,
   TextInput,
   TouchableOpacity,
@@ -71,85 +74,96 @@ export default function LoginScreen() {
         </View>
       </View>
 
-      {/* Conteúdo principal */}
-      <View style={styles.mainContent}>
-        {/* Título */}
-        <View style={styles.textContainer}>
-          <ThemedText style={styles.title}>Entrar</ThemedText>
-          <ThemedText style={styles.description}>
-            Digite seu email e senha para acessar sua conta
-          </ThemedText>
-        </View>
+      {/* Conteúdo principal com KeyboardAvoidingView */}
+      <KeyboardAvoidingView
+        style={styles.keyboardAvoidingView}
+        behavior={Platform.OS === "ios" ? "padding" : "height"}
+        keyboardVerticalOffset={Platform.OS === "ios" ? 0 : 20}
+      >
+        <ScrollView
+          style={styles.scrollView}
+          contentContainerStyle={styles.scrollContent}
+          showsVerticalScrollIndicator={false}
+          keyboardShouldPersistTaps="handled"
+        >
+          {/* Título */}
+          <View style={styles.textContainer}>
+            <ThemedText style={styles.title}>Entrar</ThemedText>
+            <ThemedText style={styles.description}>
+              Digite seu email e senha para acessar sua conta
+            </ThemedText>
+          </View>
 
-        {/* Campo de email */}
-        <View style={styles.inputContainer}>
-          <ThemedText style={styles.inputLabel}>Email</ThemedText>
-          <TextInput
-            style={styles.textInput}
-            value={email}
-            onChangeText={setEmail}
-            placeholder="seu@email.com"
-            placeholderTextColor="#D1D5DB"
-            keyboardType="email-address"
-            autoCapitalize="none"
-            autoCorrect={false}
-            selectionColor={AuthColors.primary}
-          />
-        </View>
-
-        {/* Campo de senha */}
-        <View style={styles.inputContainer}>
-          <ThemedText style={styles.inputLabel}>Senha</ThemedText>
-          <View style={styles.passwordContainer}>
+          {/* Campo de email */}
+          <View style={styles.inputContainer}>
+            <ThemedText style={styles.inputLabel}>Email</ThemedText>
             <TextInput
-              style={styles.passwordInput}
-              value={password}
-              onChangeText={setPassword}
-              placeholder="senha123"
+              style={styles.textInput}
+              value={email}
+              onChangeText={setEmail}
+              placeholder="seu@email.com"
               placeholderTextColor="#D1D5DB"
-              secureTextEntry={!showPassword}
+              keyboardType="email-address"
+              autoCapitalize="none"
+              autoCorrect={false}
               selectionColor={AuthColors.primary}
             />
-            <TouchableOpacity
-              style={styles.eyeButton}
-              onPress={() => setShowPassword(!showPassword)}
-            >
-              <Ionicons
-                name={showPassword ? "eye-off" : "eye"}
-                size={20}
-                color="#666666"
-              />
-            </TouchableOpacity>
           </View>
-        </View>
 
-        {/* Botão de login */}
-        <TouchableOpacity
-          style={[
-            styles.submitButton,
-            (!email.trim() || !password.trim()) && styles.disabledButton,
-          ]}
-          onPress={handleSubmit}
-          disabled={!email.trim() || !password.trim() || isLoading}
-        >
-          <ThemedText style={styles.submitButtonText}>
-            {isLoading ? "Entrando..." : "Entrar"}
-          </ThemedText>
-        </TouchableOpacity>
+          {/* Campo de senha */}
+          <View style={styles.inputContainer}>
+            <ThemedText style={styles.inputLabel}>Senha</ThemedText>
+            <View style={styles.passwordContainer}>
+              <TextInput
+                style={styles.passwordInput}
+                value={password}
+                onChangeText={setPassword}
+                placeholder="senha123"
+                placeholderTextColor="#D1D5DB"
+                secureTextEntry={!showPassword}
+                selectionColor={AuthColors.primary}
+              />
+              <TouchableOpacity
+                style={styles.eyeButton}
+                onPress={() => setShowPassword(!showPassword)}
+              >
+                <Ionicons
+                  name={showPassword ? "eye-off" : "eye"}
+                  size={20}
+                  color="#666666"
+                />
+              </TouchableOpacity>
+            </View>
+          </View>
 
-        {/* Texto para usuários sem conta */}
-        <View style={styles.noAccountContainer}>
-          <ThemedText style={styles.noAccountText}>
-            Não tem uma conta?{" "}
-            <ThemedText
-              style={styles.linkText}
-              onPress={() => router.push("/auth/register" as any)}
-            >
-              Criar conta
+          {/* Botão de login */}
+          <TouchableOpacity
+            style={[
+              styles.submitButton,
+              (!email.trim() || !password.trim()) && styles.disabledButton,
+            ]}
+            onPress={handleSubmit}
+            disabled={!email.trim() || !password.trim() || isLoading}
+          >
+            <ThemedText style={styles.submitButtonText}>
+              {isLoading ? "Entrando..." : "Entrar"}
             </ThemedText>
-          </ThemedText>
-        </View>
-      </View>
+          </TouchableOpacity>
+
+          {/* Texto para usuários sem conta */}
+          <View style={styles.noAccountContainer}>
+            <ThemedText style={styles.noAccountText}>
+              Não tem uma conta?{" "}
+              <ThemedText
+                style={styles.linkText}
+                onPress={() => router.push("/auth/register" as any)}
+              >
+                Criar conta
+              </ThemedText>
+            </ThemedText>
+          </View>
+        </ScrollView>
+      </KeyboardAvoidingView>
     </ThemedView>
   );
 }
@@ -207,10 +221,12 @@ const styles = StyleSheet.create({
   headerSpacer: {
     width: 40,
   },
-  mainContent: {
-    flex: 1,
+  scrollContent: {
+    flexGrow: 1,
+    justifyContent: "center",
     paddingHorizontal: 32,
     paddingTop: 40,
+    paddingBottom: 40,
   },
   textContainer: {
     marginBottom: 32,
@@ -312,5 +328,11 @@ const styles = StyleSheet.create({
   linkText: {
     color: AuthColors.primary,
     fontWeight: "bold",
+  },
+  keyboardAvoidingView: {
+    flex: 1,
+  },
+  scrollView: {
+    flex: 1,
   },
 });

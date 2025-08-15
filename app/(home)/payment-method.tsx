@@ -9,10 +9,12 @@ export default function PaymentMethodScreen() {
   const router = useRouter();
   const { cardId } = useLocalSearchParams();
 
-  const handleNFCPayment = () => {
-    // TODO: Implement NFC payment logic
-    console.log("NFC payment selected for card:", cardId);
-    // Navigate to NFC payment screen or show NFC interface
+  const handleContactlessPayment = () => {
+    // Navigate to contactless payment screen
+    router.push({
+      pathname: "/(home)/contactless-payment",
+      params: { cardId },
+    });
   };
 
   const handleQRPayment = () => {
@@ -94,10 +96,10 @@ export default function PaymentMethodScreen() {
             Selecione o método de pagamento
           </ThemedText>
 
-          {/* NFC Payment Option - Enhanced Card */}
+          {/* Contactless Payment Option - Enhanced Card */}
           <TouchableOpacity
             style={styles.methodCard}
-            onPress={handleNFCPayment}
+            onPress={handleContactlessPayment}
             activeOpacity={0.9}
           >
             <LinearGradient
@@ -107,18 +109,18 @@ export default function PaymentMethodScreen() {
               <View style={styles.methodCardHeader}>
                 <View style={styles.methodIconContainer}>
                   <MaterialIcons
-                    name="nfc"
+                    name="contactless"
                     size={28}
                     color={Colors.light.tint}
                   />
                 </View>
                 <View style={styles.methodCardContent}>
                   <ThemedText style={styles.methodCardTitle}>
-                    Pagamento NFC
+                    Pagamento Contactless
                   </ThemedText>
                   <ThemedText style={styles.methodCardDescription}>
-                    Toque o seu cartão no dispositivo para pagar de forma rápida
-                    e segura
+                    Aproxime o seu cartão do dispositivo para pagar de forma
+                    rápida e segura
                   </ThemedText>
                 </View>
                 <View style={styles.methodCardArrow}>
@@ -364,7 +366,7 @@ const styles = StyleSheet.create({
   methodsTitle: {
     fontSize: 18,
     fontWeight: "600",
-    color: "black   ",
+    color: "black",
     marginBottom: 24,
     textAlign: "center",
   },

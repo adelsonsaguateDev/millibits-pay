@@ -50,6 +50,10 @@ export default function RootLayout() {
           name="(home)/payment-confirmation"
           options={{ headerShown: false }}
         />
+        <Stack.Screen
+          name="(home)/contactless-payment"
+          options={{ headerShown: false }}
+        />
         <Stack.Screen name="+not-found" />
       </Stack>
       <StatusBar style="auto" />
