@@ -154,13 +154,9 @@ export default function AddCardScreen() {
       {/* Bottom actions */}
       <View style={styles.bottomActions}>
         <TouchableOpacity
-          style={styles.cancelButton}
-          onPress={() => router.back()}
+          style={styles.manualButton}
+          onPress={() => router.push("/(home)/add-card-manual")}
         >
-          <ThemedText style={styles.cancelButtonText}>Cancelar</ThemedText>
-        </TouchableOpacity>
-
-        <TouchableOpacity style={styles.manualButton}>
           <ThemedText style={styles.manualButtonText}>
             Adicionar Manualmente
           </ThemedText>
@@ -322,37 +318,21 @@ const styles = StyleSheet.create({
     color: "#666",
   },
   bottomActions: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    paddingHorizontal: 20,
-    paddingBottom: 30,
-    gap: 16,
-  },
-  cancelButton: {
-    flex: 1,
-    height: 50,
-    borderRadius: 25,
-    backgroundColor: "rgba(255, 255, 255, 0.2)",
     justifyContent: "center",
     alignItems: "center",
-    borderWidth: 1,
-    borderColor: "rgba(255, 255, 255, 0.3)",
-  },
-  cancelButtonText: {
-    color: "white",
-    fontSize: 16,
-    fontWeight: "600",
+    paddingHorizontal: 20,
+    paddingBottom: 30,
   },
   manualButton: {
-    flex: 1,
+    width: 280,
     height: 50,
     borderRadius: 25,
-    backgroundColor: "white",
+    backgroundColor: Colors.light.tint,
     justifyContent: "center",
     alignItems: "center",
   },
   manualButtonText: {
-    color: Colors.light.tint,
+    color: "white",
     fontSize: 16,
     fontWeight: "600",
   },

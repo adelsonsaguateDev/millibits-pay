@@ -1,3 +1,8 @@
+import { MilleBitLogo } from "@/components/MilleBitLogo";
+import { ThemedText } from "@/components/ThemedText";
+import { ThemedView } from "@/components/ThemedView";
+import { AuthColors } from "@/constants/Colors";
+import { useAuth } from "@/hooks/useAuth";
 import { Ionicons } from "@expo/vector-icons";
 import { router } from "expo-router";
 import { useState } from "react";
@@ -8,12 +13,6 @@ import {
   TouchableOpacity,
   View,
 } from "react-native";
-
-import { MilleBitLogo } from "@/components/MilleBitLogo";
-import { ThemedText } from "@/components/ThemedText";
-import { ThemedView } from "@/components/ThemedView";
-import { AuthColors } from "@/constants/Colors";
-import { useAuth } from "@/hooks/useAuth";
 
 export default function AuthScreen() {
   const { signIn, hasCredentials, isFirstTime, verifyCredentials } = useAuth();
