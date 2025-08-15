@@ -138,7 +138,7 @@ export default function AddCardScreen() {
           <ThemedText style={styles.scanningText}>Digitalizando...</ThemedText>
           <ThemedText style={styles.instructionText}>
             Coloque e mova lentamente o cartão de crédito ou débito na parte de
-            trás do seu celular.
+            trás do seu telemóvel.
           </ThemedText>
         </View>
 
@@ -146,7 +146,7 @@ export default function AddCardScreen() {
         <View style={styles.statusContainer}>
           <View style={styles.statusDot} />
           <ThemedText style={styles.statusText}>
-            Aguardando cartão...
+            À espera do cartão...
           </ThemedText>
         </View>
       </View>

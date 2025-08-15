@@ -14,7 +14,14 @@ export default function HomeScreen() {
   const router = useRouter();
 
   const renderCard = (card: any) => (
-    <View key={card.id} style={styles.card}>
+    <TouchableOpacity
+      key={card.id}
+      style={styles.card}
+      onPress={() =>
+        router.push(`/(home)/payment-method?cardId=${card.id}` as any)
+      }
+      activeOpacity={0.8}
+    >
       <View style={styles.cardHeader}>
         <View style={styles.cardLogo}>
           <ThemedText style={styles.cardLogoText}>MB</ThemedText>
@@ -41,8 +48,15 @@ export default function HomeScreen() {
             {card.expiryMonth}/{card.expiryYear}
           </ThemedText>
         </View>
+        <View style={styles.tapIndicator}>
+          <MaterialIcons
+            name="touch-app"
+            size={16}
+            color="rgba(255, 255, 255, 0.6)"
+          />
+        </View>
       </View>
-    </View>
+    </TouchableOpacity>
   );
 
   const renderCardPlaceholder = () => (
@@ -152,7 +166,7 @@ export default function HomeScreen() {
             {/* Add Card Hint */}
             <View style={styles.addCardHint}>
               <ThemedText style={styles.hintText}>
-                Toque no botão flutuante para adicionar seu primeiro cartão
+                Toque no botão flutuante para adicionar o seu primeiro cartão
               </ThemedText>
             </View>
           </>
@@ -252,6 +266,9 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.3,
     shadowRadius: 8,
     elevation: 8,
+    // Add subtle border to indicate interactivity
+    borderWidth: 1,
+    borderColor: "rgba(255, 255, 255, 0.1)",
   },
   cardPlaceholder: {
     width: 320,
@@ -336,6 +353,7 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     justifyContent: "space-between",
     alignItems: "flex-end",
+    position: "relative",
   },
   cardHolderInfo: {
     alignItems: "flex-start",
@@ -386,6 +404,12 @@ const styles = StyleSheet.create({
     height: 6,
     backgroundColor: "#adb5bd",
     borderRadius: 3,
+  },
+  tapIndicator: {
+    position: "absolute",
+    right: 0,
+    bottom: 0,
+    padding: 8,
   },
   cardHolderLabelPlaceholder: {
     fontSize: 10,

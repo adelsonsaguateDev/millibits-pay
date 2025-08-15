@@ -92,7 +92,7 @@ export default function SettingsScreen() {
             "Configure suas notificações"
           )}
           {renderSettingItem("moon", "Tema", "Escolha o tema do app")}
-          {renderSettingItem("language", "Idioma", "Português (Brasil)")}
+          {renderSettingItem("language", "Idioma", "Português (Portugal)")}
         </View>
 
         <View style={styles.section}>

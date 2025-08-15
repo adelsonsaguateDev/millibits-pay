@@ -33,19 +33,19 @@ export default function AddCardManualScreen() {
 
   const validateForm = () => {
     if (!cardNumber.replace(/\s/g, "").match(/^\d{16}$/)) {
-      Alert.alert("Erro", "Número do cartão deve ter 16 dígitos");
+      Alert.alert("Erro", "O número do cartão deve ter 16 dígitos");
       return false;
     }
     if (!cardholderName.trim()) {
-      Alert.alert("Erro", "Nome do titular é obrigatório");
+      Alert.alert("Erro", "O nome do titular é obrigatório");
       return false;
     }
     if (!expiryMonth || !expiryYear) {
-      Alert.alert("Erro", "Data de validade é obrigatória");
+      Alert.alert("Erro", "A data de validade é obrigatória");
       return false;
     }
     if (!cvv.match(/^\d{3,4}$/)) {
-      Alert.alert("Erro", "CVV deve ter 3 ou 4 dígitos");
+      Alert.alert("Erro", "O CVV deve ter 3 ou 4 dígitos");
       return false;
     }
     return true;
@@ -62,11 +62,11 @@ export default function AddCardManualScreen() {
           expiryYear: expiryYear,
           cvv: cvv,
         });
-        Alert.alert("Sucesso", "Cartão adicionado com sucesso!", [
+        Alert.alert("Sucesso", "O cartão foi adicionado com sucesso!", [
           { text: "OK", onPress: () => router.push("/(home)") },
         ]);
       } catch (error) {
-        Alert.alert("Erro", "Falha ao adicionar cartão.");
+        Alert.alert("Erro", "Falha ao adicionar o cartão.");
         console.error(error);
       } finally {
         setIsSaving(false);
@@ -221,7 +221,7 @@ export default function AddCardManualScreen() {
                 disabled={isSaving}
               >
                 <ThemedText style={styles.saveButtonText}>
-                  {isSaving ? "Salvando..." : "Salvar Cartão"}
+                  {isSaving ? "A guardar..." : "Guardar Cartão"}
                 </ThemedText>
               </TouchableOpacity>
             </View>

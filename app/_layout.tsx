@@ -38,6 +38,10 @@ export default function RootLayout() {
         />
         <Stack.Screen name="(home)/settings" options={{ headerShown: false }} />
         <Stack.Screen name="(home)/security" options={{ headerShown: false }} />
+        <Stack.Screen
+          name="(home)/payment-method"
+          options={{ headerShown: false }}
+        />
         <Stack.Screen name="+not-found" />
       </Stack>
       <StatusBar style="auto" />

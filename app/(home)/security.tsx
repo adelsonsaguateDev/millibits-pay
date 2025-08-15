@@ -71,7 +71,7 @@ export default function SecurityScreen() {
           {renderSecurityItem(
             "finger-print",
             "Ativar Biometria",
-            "Use sua impressão digital ou Face ID para entrar no app",
+            "Use a sua impressão digital ou Face ID para entrar na aplicação",
             <Switch
               value={isBiometricEnabled}
               onValueChange={toggleBiometrics}
@@ -87,12 +87,12 @@ export default function SecurityScreen() {
           {renderSecurityItem(
             "eye-off",
             "Ocultar Saldo",
-            "Oculta o saldo dos cartões na tela inicial"
+            "Oculta o saldo dos cartões no ecrã inicial"
           )}
           {renderSecurityItem(
             "lock-closed",
-            "Bloquear App",
-            "Bloqueia o app quando não estiver em uso"
+            "Bloquear Aplicação",
+            "Bloqueia a aplicação quando não estiver em uso"
           )}
         </View>
 
