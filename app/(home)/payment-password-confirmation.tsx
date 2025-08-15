@@ -70,9 +70,7 @@ export default function PaymentPasswordConfirmationScreen() {
       // Show success message
       Alert.alert(
         "Pagamento Confirmado!",
-        `Pagamento de ${parseFloat(amount || "500").toFixed(
-          2
-        )}Mzn realizado com sucesso.`,
+        `Pagamento de 500 MZN realizado com sucesso.`,
         [
           {
             text: "OK",

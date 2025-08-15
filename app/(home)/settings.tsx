@@ -5,10 +5,12 @@ import { Ionicons } from "@expo/vector-icons";
 import { LinearGradient } from "expo-linear-gradient";
 import { useRouter } from "expo-router";
 import { ScrollView, StyleSheet, TouchableOpacity, View } from "react-native";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 export default function SettingsScreen() {
   const { signOut } = useAuth();
   const router = useRouter();
+  const insets = useSafeAreaInsets();
 
   const handleSignOut = () => {
     console.log("🧹 Clearing all cached data for testing...");
@@ -63,36 +65,20 @@ export default function SettingsScreen() {
       </View>
 
       {/* Settings Content */}
-      <ScrollView style={styles.content} showsVerticalScrollIndicator={false}>
+      <ScrollView
+        style={styles.content}
+        showsVerticalScrollIndicator={false}
+        contentContainerStyle={{ paddingBottom: insets.bottom + 20 }}
+      >
         <View style={styles.section}>
           <ThemedText style={styles.sectionTitle}>Conta</ThemedText>
-          {renderSettingItem(
-            "person",
-            "Perfil",
-            "Gerencie suas informações pessoais"
-          )}
-          {renderSettingItem(
-            "card",
-            "Cartões",
-            "Gerencie seus cartões cadastrados"
-          )}
+
           {renderSettingItem(
             "shield-checkmark",
             "Segurança",
             "Configurações de segurança",
             () => router.push("/(home)/security" as any)
           )}
-        </View>
-
-        <View style={styles.section}>
-          <ThemedText style={styles.sectionTitle}>Preferências</ThemedText>
-          {renderSettingItem(
-            "notifications",
-            "Notificações",
-            "Configure suas notificações"
-          )}
-          {renderSettingItem("moon", "Tema", "Escolha o tema do app")}
-          {renderSettingItem("language", "Idioma", "Português (Portugal)")}
         </View>
 
         <View style={styles.section}>
@@ -107,7 +93,9 @@ export default function SettingsScreen() {
         </View>
 
         {/* Sign Out Button */}
-        <View style={styles.signOutSection}>
+        <View
+          style={[styles.signOutSection, { marginBottom: insets.bottom + 20 }]}
+        >
           <TouchableOpacity
             style={styles.signOutButton}
             onPress={handleSignOut}

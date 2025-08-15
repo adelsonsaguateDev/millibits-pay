@@ -1,5 +1,7 @@
 import { ThemedText } from "@/components/ThemedText";
 import { Colors } from "@/constants/Colors";
+import { useBiometrics } from "@/hooks/useBiometrics";
+import { useBiometricState } from "@/hooks/useBiometricState";
 import MaterialIcons from "@expo/vector-icons/MaterialIcons";
 import { LinearGradient } from "expo-linear-gradient";
 import { useLocalSearchParams, useRouter } from "expo-router";
@@ -25,6 +27,10 @@ export default function PaymentConfirmationScreen() {
     ? params.description[0]
     : params.description;
 
+  // Biometrics hooks
+  const { authenticate, isAuthenticating } = useBiometrics();
+  const { isBiometricEnabled } = useBiometricState();
+
   // Mock transaction details
   const transactionDate = new Date().toLocaleDateString("pt-BR");
   const transactionTime = new Date().toLocaleTimeString("pt-BR", {
@@ -48,6 +54,65 @@ export default function PaymentConfirmationScreen() {
         description,
       },
     });
+  };
+
+  const handleBiometricPayment = async () => {
+    try {
+      const result = await authenticate(
+        "Confirme sua identidade para confirmar o pagamento"
+      );
+
+      if (result.success) {
+        // Process payment directly with biometrics
+        await processPayment();
+      } else {
+        Alert.alert(
+          "Falha na Autenticação",
+          result.error ||
+            "Não foi possível verificar sua identidade. Tente novamente ou use a senha."
+        );
+      }
+    } catch (error) {
+      console.error("Biometric authentication error:", error);
+      Alert.alert(
+        "Erro na Autenticação",
+        "Ocorreu um erro na autenticação biométrica. Tente novamente ou use a senha."
+      );
+    }
+  };
+
+  const processPayment = async () => {
+    try {
+      // Simulate payment processing
+      await new Promise((resolve) => setTimeout(resolve, 2000));
+
+      // Show success message
+      Alert.alert(
+        "Pagamento Confirmado!",
+        `Pagamento de 500 MZN realizado com sucesso usando biometria.`,
+        [
+          {
+            text: "OK",
+            onPress: () => {
+              router.push("/(home)");
+            },
+          },
+        ]
+      );
+    } catch (error) {
+      Alert.alert(
+        "Erro no Pagamento",
+        "Ocorreu um erro ao processar o pagamento. Tente novamente.",
+        [
+          {
+            text: "Tentar Novamente",
+            onPress: () => {
+              router.push("/(home)");
+            },
+          },
+        ]
+      );
+    }
   };
 
   const handleCancel = () => {
@@ -127,9 +192,7 @@ export default function PaymentConfirmationScreen() {
                 <View style={styles.summaryRow}>
                   <ThemedText style={styles.summaryLabel}>Valor:</ThemedText>
                   <View style={styles.amountContainer}>
-                    <ThemedText style={styles.amountValue}>
-                      {parseFloat(amount || "500").toFixed(2)}
-                    </ThemedText>
+                    <ThemedText style={styles.amountValue}>500</ThemedText>
                     <ThemedText style={styles.currencySymbol}>MZN</ThemedText>
                   </View>
                 </View>
@@ -216,17 +279,59 @@ export default function PaymentConfirmationScreen() {
               criptografia avançada.
             </ThemedText>
           </View>
+
+          {/* Biometric Notice */}
+          {isBiometricEnabled && (
+            <View style={styles.biometricNotice}>
+              <MaterialIcons
+                name="fingerprint"
+                size={20}
+                color={Colors.light.tint}
+              />
+              <ThemedText style={styles.biometricText}>
+                Biometria ativada! Você pode confirmar o pagamento usando sua
+                impressão digital ou Face ID.
+              </ThemedText>
+            </View>
+          )}
         </ScrollView>
 
         {/* Bottom Actions */}
         <View style={styles.bottomActions}>
-          <TouchableOpacity
-            style={styles.confirmButton}
-            onPress={handleConfirmPayment}
-          >
-            <ThemedText style={styles.confirmButtonText}>
-              Confirmar Pagamento
-            </ThemedText>
+          {isBiometricEnabled ? (
+            <>
+              <TouchableOpacity
+                style={[styles.confirmButton, styles.biometricButton]}
+                onPress={handleBiometricPayment}
+                disabled={isAuthenticating}
+              >
+                <ThemedText style={styles.confirmButtonText}>
+                  {isAuthenticating ? "Autenticando..." : "Confirmar Pagamento"}
+                </ThemedText>
+              </TouchableOpacity>
+
+              <TouchableOpacity
+                style={styles.passwordButton}
+                onPress={handleConfirmPayment}
+              >
+                <ThemedText style={styles.passwordButtonText}>
+                  Usar Senha
+                </ThemedText>
+              </TouchableOpacity>
+            </>
+          ) : (
+            <TouchableOpacity
+              style={styles.confirmButton}
+              onPress={handleConfirmPayment}
+            >
+              <ThemedText style={styles.confirmButtonText}>
+                Confirmar Pagamento
+              </ThemedText>
+            </TouchableOpacity>
+          )}
+
+          <TouchableOpacity style={styles.cancelButton} onPress={handleCancel}>
+            <ThemedText style={styles.cancelButtonText}>Cancelar</ThemedText>
           </TouchableOpacity>
         </View>
       </LinearGradient>
@@ -400,46 +505,81 @@ const styles = StyleSheet.create({
     lineHeight: 20,
   },
 
+  // Biometric Notice
+  biometricNotice: {
+    flexDirection: "row",
+    alignItems: "center",
+    backgroundColor: "rgba(227, 28, 121, 0.1)",
+    borderWidth: 1,
+    borderColor: "rgba(227, 28, 121, 0.3)",
+    padding: 16,
+    borderRadius: 12,
+    gap: 12,
+    marginTop: 12,
+  },
+  biometricText: {
+    flex: 1,
+    fontSize: 14,
+    color: Colors.light.tint,
+    lineHeight: 20,
+    fontWeight: "500",
+  },
+
   // Bottom Actions
   bottomActions: {
-    flexDirection: "row",
+    flexDirection: "column",
     paddingHorizontal: 20,
     paddingBottom: 40,
     gap: 16,
     justifyContent: "center",
+    alignItems: "center",
   },
   cancelButton: {
+    width: 200,
+    height: 50,
+    borderRadius: 25,
     backgroundColor: "rgba(255, 255, 255, 0.2)",
-    paddingVertical: 16,
-    paddingHorizontal: 24,
-    borderRadius: 999,
     borderWidth: 2,
     borderColor: "rgba(255, 255, 255, 0.3)",
+    justifyContent: "center",
     alignItems: "center",
-    minWidth: 120,
-    shadowColor: "#000000",
-    shadowOffset: {
-      width: 0,
-      height: 2,
-    },
-    shadowOpacity: 0.1,
-    shadowRadius: 4,
-    elevation: 3,
   },
   cancelButtonText: {
     color: "white",
-    fontSize: 18,
-    fontWeight: "bold",
+    fontSize: 16,
+    fontWeight: "600",
   },
   confirmButton: {
-    width: 200,
+    width: 280,
     height: 50,
     borderRadius: 25,
     backgroundColor: Colors.light.tint,
     justifyContent: "center",
     alignItems: "center",
   },
+  biometricButton: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "center",
+    backgroundColor: Colors.light.tint,
+    width: 280,
+  },
+  passwordButton: {
+    width: 200,
+    height: 50,
+    borderRadius: 25,
+    backgroundColor: "rgba(255, 255, 255, 0.2)",
+    borderWidth: 2,
+    borderColor: "rgba(255, 255, 255, 0.3)",
+    justifyContent: "center",
+    alignItems: "center",
+  },
   confirmButtonText: {
+    color: "white",
+    fontSize: 16,
+    fontWeight: "600",
+  },
+  passwordButtonText: {
     color: "white",
     fontSize: 16,
     fontWeight: "600",

@@ -1,11 +1,13 @@
 import { ThemedText } from "@/components/ThemedText";
 import { Colors } from "@/constants/Colors";
 import { useBiometrics } from "@/hooks/useBiometrics";
+import { useBiometricState } from "@/hooks/useBiometricState";
+import { BiometricStorage } from "@/utils/biometricStorage";
 import { Ionicons } from "@expo/vector-icons";
 import { LinearGradient } from "expo-linear-gradient";
 import { useRouter } from "expo-router";
-import { useState } from "react";
 import {
+  Alert,
   ScrollView,
   StyleSheet,
   Switch,
@@ -15,11 +17,49 @@ import {
 
 export default function SecurityScreen() {
   const router = useRouter();
-  const { isBiometricAvailable } = useBiometrics();
-  const [isBiometricEnabled, setIsBiometricEnabled] = useState(false);
+  const { isBiometricAvailable, authenticate, isAuthenticating } =
+    useBiometrics();
+  const { isBiometricEnabled, refreshBiometricState } = useBiometricState();
 
-  const toggleBiometrics = () => {
-    setIsBiometricEnabled(!isBiometricEnabled);
+  const toggleBiometrics = async () => {
+    if (isBiometricEnabled) {
+      // If currently enabled, just disable it
+      try {
+        await BiometricStorage.setBiometricEnabled(false);
+        refreshBiometricState();
+        Alert.alert(
+          "Biometria Desativada",
+          "A autenticação biométrica foi desativada."
+        );
+      } catch (error) {
+        console.error("Error disabling biometrics:", error);
+        Alert.alert("Erro", "Não foi possível desativar a biometria.");
+      }
+    } else {
+      // If currently disabled, authenticate and enable it
+      try {
+        const result = await authenticate(
+          "Confirme sua identidade para ativar a biometria"
+        );
+
+        if (result.success) {
+          await BiometricStorage.setBiometricEnabled(true);
+          refreshBiometricState();
+          Alert.alert(
+            "Biometria Ativada",
+            "A autenticação biométrica foi ativada com sucesso!"
+          );
+        } else {
+          Alert.alert(
+            "Falha na Autenticação",
+            result.error || "Não foi possível verificar sua identidade."
+          );
+        }
+      } catch (error) {
+        console.error("Error enabling biometrics:", error);
+        Alert.alert("Erro", "Ocorreu um erro ao ativar a biometria.");
+      }
+    }
   };
 
   const goBack = () => {
@@ -68,18 +108,34 @@ export default function SecurityScreen() {
       <ScrollView style={styles.content} showsVerticalScrollIndicator={false}>
         <View style={styles.section}>
           <ThemedText style={styles.sectionTitle}>Autenticação</ThemedText>
-          {renderSecurityItem(
-            "finger-print",
-            "Ativar Biometria",
-            "Use a sua impressão digital ou Face ID para entrar na aplicação",
-            <Switch
-              value={isBiometricEnabled}
-              onValueChange={toggleBiometrics}
-              trackColor={{ false: "#e0e0e0", true: Colors.light.tint }}
-              thumbColor="white"
-              ios_backgroundColor="#e0e0e0"
-            />
-          )}
+          {isBiometricAvailable
+            ? renderSecurityItem(
+                "finger-print",
+                "Ativar Biometria",
+                "Use a sua impressão digital ou Face ID para entrar na aplicação",
+                isAuthenticating ? (
+                  <View style={styles.loadingSwitch}>
+                    <Ionicons name="sync" size={20} color={Colors.light.tint} />
+                  </View>
+                ) : (
+                  <Switch
+                    value={isBiometricEnabled}
+                    onValueChange={toggleBiometrics}
+                    disabled={isAuthenticating}
+                    trackColor={{ false: "#e0e0e0", true: Colors.light.tint }}
+                    thumbColor="white"
+                    ios_backgroundColor="#e0e0e0"
+                  />
+                )
+              )
+            : renderSecurityItem(
+                "finger-print",
+                "Ativar Biometria",
+                "Biometria não disponível neste dispositivo",
+                <View style={styles.disabledSwitch}>
+                  <Ionicons name="close-circle" size={24} color="#999" />
+                </View>
+              )}
         </View>
       </ScrollView>
     </LinearGradient>
@@ -171,5 +227,17 @@ const styles = StyleSheet.create({
   },
   securityItemRight: {
     marginLeft: 16,
+  },
+  disabledSwitch: {
+    width: 24,
+    height: 24,
+    justifyContent: "center",
+    alignItems: "center",
+  },
+  loadingSwitch: {
+    width: 24,
+    height: 24,
+    justifyContent: "center",
+    alignItems: "center",
   },
 });
