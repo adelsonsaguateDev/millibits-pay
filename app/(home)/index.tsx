@@ -48,13 +48,13 @@ export default function HomeScreen() {
 
       <View style={styles.cardFooter}>
         <View style={styles.cardHolderInfo}>
-          <ThemedText style={styles.cardHolderLabel}>CARD HOLDER</ThemedText>
+          <ThemedText style={styles.cardHolderLabel}>TITULAR</ThemedText>
           <ThemedText style={styles.cardHolderNameText}>
             {card.cardholderName}
           </ThemedText>
         </View>
         <View style={styles.cardExpiryInfo}>
-          <ThemedText style={styles.cardExpiryLabel}>EXPIRES</ThemedText>
+          <ThemedText style={styles.cardExpiryLabel}>EXPIRA EM</ThemedText>
           <ThemedText style={styles.cardExpiryDateText}>
             {card.expiryMonth}/{card.expiryYear}
           </ThemedText>
@@ -109,7 +109,7 @@ export default function HomeScreen() {
       <View style={styles.cardFooter}>
         <View style={styles.cardHolderInfo}>
           <ThemedText style={styles.cardHolderLabelPlaceholder}>
-            CARD HOLDER
+            TITULAR
           </ThemedText>
           <View style={styles.cardHolderName}>
             <View style={styles.cardHolderDot} />
@@ -124,7 +124,7 @@ export default function HomeScreen() {
         </View>
         <View style={styles.cardExpiryInfo}>
           <ThemedText style={styles.cardExpiryLabelPlaceholder}>
-            EXPIRES
+            EXPIRA EM
           </ThemedText>
           <View style={styles.cardExpiryDate}>
             <View style={styles.cardExpiryDot} />
@@ -153,6 +153,13 @@ export default function HomeScreen() {
               <ThemedText style={styles.logoText}>BitPay</ThemedText>
             </View>
             <View style={styles.profileContainer}>
+              <TouchableOpacity
+                style={styles.profileButton}
+                onPress={() => router.push("/(home)/history" as any)}
+                accessibilityLabel="Open transaction history"
+              >
+                <MaterialIcons name="history" size={24} color="white" />
+              </TouchableOpacity>
               <TouchableOpacity
                 style={styles.profileButton}
                 onPress={() => router.push("/(home)/settings" as any)}
@@ -213,6 +220,13 @@ export default function HomeScreen() {
               <ThemedText style={styles.logoText}>BitPay</ThemedText>
             </View>
             <View style={styles.profileContainer}>
+              <TouchableOpacity
+                style={styles.profileButton}
+                onPress={() => router.push("/(home)/history" as any)}
+                accessibilityLabel="Open transaction history"
+              >
+                <MaterialIcons name="history" size={24} color="white" />
+              </TouchableOpacity>
               <TouchableOpacity
                 style={styles.profileButton}
                 onPress={() => router.push("/(home)/settings" as any)}

@@ -2,7 +2,6 @@ import { ThemedText } from "@/components/ThemedText";
 import { Colors } from "@/constants/Colors";
 import { useAuth } from "@/hooks/useAuth";
 import { Ionicons } from "@expo/vector-icons";
-import { LinearGradient } from "expo-linear-gradient";
 import { useRouter } from "expo-router";
 import { ScrollView, StyleSheet, TouchableOpacity, View } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
@@ -51,10 +50,7 @@ export default function SettingsScreen() {
   );
 
   return (
-    <LinearGradient
-      colors={[Colors.light.tint, Colors.light.background]}
-      style={styles.container}
-    >
+    <View style={styles.container}>
       {/* Header */}
       <View style={styles.header}>
         <TouchableOpacity style={styles.backButton} onPress={goBack}>
@@ -105,13 +101,14 @@ export default function SettingsScreen() {
           </TouchableOpacity>
         </View>
       </ScrollView>
-    </LinearGradient>
+    </View>
   );
 }
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
+    backgroundColor: Colors.light.tint,
   },
   header: {
     flexDirection: "row",
@@ -130,13 +127,13 @@ const styles = StyleSheet.create({
   },
   headerTitle: {
     flex: 1,
-    fontSize: 24,
+    fontSize: 18,
     fontWeight: "bold",
     color: "white",
     textAlign: "center",
   },
   headerSpacer: {
-    width: 40,
+    width: 38,
   },
   content: {
     flex: 1,

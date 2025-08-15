@@ -58,6 +58,7 @@ export default function RootLayout() {
           name="(home)/payment-password-confirmation"
           options={{ headerShown: false }}
         />
+        <Stack.Screen name="(home)/history" options={{ headerShown: false }} />
         <Stack.Screen name="+not-found" />
       </Stack>
       <StatusBar style="auto" />
