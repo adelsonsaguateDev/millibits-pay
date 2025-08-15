@@ -1,7 +1,6 @@
 import { ThemedText } from "@/components/ThemedText";
 import { Colors } from "@/constants/Colors";
 import MaterialIcons from "@expo/vector-icons/MaterialIcons";
-import { BarCodeScanner } from "expo-barcode-scanner";
 import { LinearGradient } from "expo-linear-gradient";
 import { useLocalSearchParams, useRouter } from "expo-router";
 import { StatusBar } from "expo-status-bar";
@@ -24,14 +23,24 @@ export default function QRScannerScreen() {
   const [hasPermission, setHasPermission] = useState<boolean | null>(null);
   const [scanned, setScanned] = useState(false);
   const [torchEnabled, setTorchEnabled] = useState(false);
+  const [isExpoGo, setIsExpoGo] = useState(false);
 
   useEffect(() => {
-    const getBarCodeScannerPermissions = async () => {
-      const { status } = await BarCodeScanner.requestPermissionsAsync();
-      setHasPermission(status === "granted");
+    // Check if we're running in Expo Go (which doesn't support native modules)
+    const checkExpoGo = async () => {
+      try {
+        // Try to import BarCodeScanner to see if it's available
+        const { BarCodeScanner } = await import("expo-barcode-scanner");
+        const { status } = await BarCodeScanner.requestPermissionsAsync();
+        setHasPermission(status === "granted");
+      } catch (error) {
+        console.log("BarCodeScanner not available, running in Expo Go");
+        setIsExpoGo(true);
+        setHasPermission(false);
+      }
     };
 
-    getBarCodeScannerPermissions();
+    checkExpoGo();
   }, []);
 
   const handleBarCodeScanned = ({
@@ -137,7 +146,7 @@ export default function QRScannerScreen() {
     });
   };
 
-  if (hasPermission === null) {
+  if (hasPermission === null && !isExpoGo) {
     return (
       <LinearGradient
         colors={[Colors.light.tint, Colors.light.background]}
@@ -153,7 +162,7 @@ export default function QRScannerScreen() {
     );
   }
 
-  if (hasPermission === false) {
+  if (hasPermission === false && !isExpoGo) {
     return (
       <LinearGradient
         colors={[Colors.light.tint, Colors.light.background]}
@@ -209,10 +218,37 @@ export default function QRScannerScreen() {
 
         {/* Camera View */}
         <View style={styles.cameraContainer}>
-          <BarCodeScanner
-            onBarCodeScanned={scanned ? undefined : handleBarCodeScanned}
-            style={styles.camera}
-          />
+          {isExpoGo ? (
+            // Expo Go fallback - show placeholder with instructions
+            <View style={styles.expoGoPlaceholder}>
+              <MaterialIcons
+                name="qr-code-scanner"
+                size={120}
+                color="rgba(255, 255, 255, 0.6)"
+              />
+              <ThemedText style={styles.expoGoTitle}>
+                Scanner QR não disponível
+              </ThemedText>
+              <ThemedText style={styles.expoGoDescription}>
+                Para usar o scanner QR, você precisa de uma versão de
+                desenvolvimento personalizada.
+              </ThemedText>
+              <ThemedText style={styles.expoGoInstructions}>
+                Use o botão "Inserir Manualmente" para continuar com o
+                pagamento.
+              </ThemedText>
+            </View>
+          ) : (
+            // Real camera view when BarCodeScanner is available
+            <>
+              {/* This will be dynamically imported when available */}
+              <View style={styles.cameraPlaceholder}>
+                <ThemedText style={styles.cameraPlaceholderText}>
+                  Carregando câmera...
+                </ThemedText>
+              </View>
+            </>
+          )}
 
           {/* Overlay with scanning frame */}
           <View style={styles.overlay}>
@@ -228,7 +264,9 @@ export default function QRScannerScreen() {
             {/* Instructions */}
             <View style={styles.instructionsContainer}>
               <ThemedText style={styles.instructionsText}>
-                Posicione o código QR dentro da área de digitalização
+                {isExpoGo
+                  ? "Use o botão abaixo para inserir dados manualmente"
+                  : "Posicione o código QR dentro da área de digitalização"}
               </ThemedText>
             </View>
           </View>
@@ -458,5 +496,45 @@ const styles = StyleSheet.create({
     color: "white",
     fontSize: 16,
     fontWeight: "600",
+  },
+
+  // Expo Go fallback styles
+  expoGoPlaceholder: {
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
+    paddingHorizontal: 40,
+  },
+  expoGoTitle: {
+    fontSize: 24,
+    fontWeight: "700",
+    color: "white",
+    textAlign: "center",
+    marginTop: 20,
+    marginBottom: 16,
+  },
+  expoGoDescription: {
+    fontSize: 16,
+    color: "rgba(255, 255, 255, 0.9)",
+    textAlign: "center",
+    lineHeight: 24,
+    marginBottom: 16,
+  },
+  expoGoInstructions: {
+    fontSize: 14,
+    color: "rgba(255, 255, 255, 0.8)",
+    textAlign: "center",
+    lineHeight: 20,
+  },
+  cameraPlaceholder: {
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
+    backgroundColor: "rgba(0, 0, 0, 0.3)",
+  },
+  cameraPlaceholderText: {
+    color: "white",
+    fontSize: 18,
+    fontWeight: "500",
   },
 });

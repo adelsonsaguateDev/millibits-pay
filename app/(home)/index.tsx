@@ -7,11 +7,13 @@ import MaterialIcons from "@expo/vector-icons/MaterialIcons";
 import { LinearGradient } from "expo-linear-gradient";
 import { useRouter } from "expo-router";
 import { ScrollView, StyleSheet, TouchableOpacity, View } from "react-native";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 export default function HomeScreen() {
   const { signOut } = useAuth();
   const { cards, loading } = useCards();
   const router = useRouter();
+  const insets = useSafeAreaInsets();
 
   const renderCard = (card: any) => (
     <TouchableOpacity
@@ -175,7 +177,7 @@ export default function HomeScreen() {
 
       {/* Floating Action Button */}
       <TouchableOpacity
-        style={styles.floatingButton}
+        style={[styles.floatingButton, { bottom: 30 + insets.bottom }]}
         onPress={() => router.push("/(home)/add-card" as any)}
       >
         <View style={styles.floatingButtonContent}>
