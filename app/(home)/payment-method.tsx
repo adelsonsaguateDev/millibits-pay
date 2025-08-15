@@ -16,9 +16,11 @@ export default function PaymentMethodScreen() {
   };
 
   const handleQRPayment = () => {
-    // TODO: Implement QR code payment logic
-    console.log("QR payment selected for card:", cardId);
-    // Navigate to QR code payment screen
+    // Navigate to QR scanner screen
+    router.push({
+      pathname: "/(home)/qr-scanner",
+      params: { cardId },
+    });
   };
 
   const goBack = () => {
