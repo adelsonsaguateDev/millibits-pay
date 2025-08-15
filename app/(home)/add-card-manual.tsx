@@ -1,10 +1,14 @@
 import { ThemedText } from "@/components/ThemedText";
 import { Colors } from "@/constants/Colors";
+import { useCards } from "@/hooks/useCards";
 import { LinearGradient } from "expo-linear-gradient";
 import { useRouter } from "expo-router";
 import { useState } from "react";
 import {
   Alert,
+  KeyboardAvoidingView,
+  Platform,
+  ScrollView,
   StyleSheet,
   TextInput,
   TouchableOpacity,
@@ -13,11 +17,13 @@ import {
 
 export default function AddCardManualScreen() {
   const router = useRouter();
+  const { addCard } = useCards();
   const [cardNumber, setCardNumber] = useState("");
   const [cardholderName, setCardholderName] = useState("");
   const [expiryMonth, setExpiryMonth] = useState("");
   const [expiryYear, setExpiryYear] = useState("");
   const [cvv, setCvv] = useState("");
+  const [isSaving, setIsSaving] = useState(false);
 
   const formatCardNumber = (text: string) => {
     const cleaned = text.replace(/\s/g, "");
@@ -45,12 +51,26 @@ export default function AddCardManualScreen() {
     return true;
   };
 
-  const handleSaveCard = () => {
+  const handleSaveCard = async () => {
     if (validateForm()) {
-      // Here you would typically save the card to your backend
-      Alert.alert("Sucesso", "Cartão adicionado com sucesso!", [
-        { text: "OK", onPress: () => router.back() },
-      ]);
+      setIsSaving(true);
+      try {
+        await addCard({
+          cardNumber: cardNumber.replace(/\s/g, ""),
+          cardholderName: cardholderName,
+          expiryMonth: expiryMonth,
+          expiryYear: expiryYear,
+          cvv: cvv,
+        });
+        Alert.alert("Sucesso", "Cartão adicionado com sucesso!", [
+          { text: "OK", onPress: () => router.back() },
+        ]);
+      } catch (error) {
+        Alert.alert("Erro", "Falha ao adicionar cartão.");
+        console.error(error);
+      } finally {
+        setIsSaving(false);
+      }
     }
   };
 
@@ -73,126 +93,141 @@ export default function AddCardManualScreen() {
       </View>
 
       {/* Main Content */}
-      <View style={styles.mainContent}>
-        {/* Card Preview */}
-        <View style={styles.cardPreview}>
-          <View style={styles.cardHeader}>
-            <View style={styles.cardChip} />
-            <View style={styles.cardLogo}>
-              <ThemedText style={styles.cardLogoText}>M</ThemedText>
+      <KeyboardAvoidingView
+        behavior={Platform.OS === "ios" ? "padding" : "height"}
+        style={styles.mainContent}
+      >
+        <ScrollView contentContainerStyle={styles.scrollContent}>
+          {/* Card Preview */}
+          <View style={styles.cardPreview}>
+            <View style={styles.cardHeader}>
+              <View style={styles.cardChip} />
+              <View style={styles.cardLogo}>
+                <ThemedText style={styles.cardLogoText}>M</ThemedText>
+              </View>
             </View>
-          </View>
 
-          <View style={styles.cardNumberContainer}>
-            <ThemedText style={styles.cardNumberText}>
-              {cardNumber || "•••• •••• •••• ••••"}
-            </ThemedText>
-          </View>
-
-          <View style={styles.cardFooter}>
-            <View>
-              <ThemedText style={styles.cardholderLabel}>TITULAR</ThemedText>
-              <ThemedText style={styles.cardholderName}>
-                {cardholderName || "NOME DO TITULAR"}
+            <View style={styles.cardNumberContainer}>
+              <ThemedText style={styles.cardNumberText}>
+                {cardNumber || "•••• •••• •••• ••••"}
               </ThemedText>
             </View>
-            <View>
-              <ThemedText style={styles.expiryLabel}>VÁLIDO ATÉ</ThemedText>
-              <ThemedText style={styles.expiryDate}>
-                {expiryMonth && expiryYear
-                  ? `${expiryMonth}/${expiryYear}`
-                  : "MM/AA"}
-              </ThemedText>
+
+            <View style={styles.cardFooter}>
+              <View>
+                <ThemedText style={styles.cardholderLabel}>TITULAR</ThemedText>
+                <ThemedText style={styles.cardholderName}>
+                  {cardholderName || "NOME DO TITULAR"}
+                </ThemedText>
+              </View>
+              <View>
+                <ThemedText style={styles.expiryLabel}>VÁLIDO ATÉ</ThemedText>
+                <ThemedText style={styles.expiryDate}>
+                  {expiryMonth && expiryYear
+                    ? `${expiryMonth}/${expiryYear}`
+                    : "MM/AA"}
+                </ThemedText>
+              </View>
             </View>
           </View>
-        </View>
 
-        {/* Form Fields */}
-        <View style={styles.formContainer}>
-          {/* Card Number */}
-          <View style={styles.inputGroup}>
-            <ThemedText style={styles.inputLabel}>Número do Cartão</ThemedText>
-            <TextInput
-              style={styles.textInput}
-              value={cardNumber}
-              onChangeText={(text) =>
-                setCardNumber(formatCardNumber(text.replace(/\D/g, "")))
-              }
-              placeholder="0000 0000 0000 0000"
-              placeholderTextColor="#999"
-              maxLength={19}
-              keyboardType="numeric"
-            />
-          </View>
-
-          {/* Cardholder Name */}
-          <View style={styles.inputGroup}>
-            <ThemedText style={styles.inputLabel}>Nome do Titular</ThemedText>
-            <TextInput
-              style={styles.textInput}
-              value={cardholderName}
-              onChangeText={setCardholderName}
-              placeholder="Como está no cartão"
-              placeholderTextColor="#999"
-              autoCapitalize="characters"
-            />
-          </View>
-
-          {/* Expiry and CVV Row */}
-          <View style={styles.row}>
-            <View style={[styles.inputGroup, styles.halfWidth]}>
-              <ThemedText style={styles.inputLabel}>Mês</ThemedText>
+          {/* Form Fields */}
+          <View style={styles.formContainer}>
+            {/* Card Number */}
+            <View style={styles.inputGroup}>
+              <ThemedText style={styles.inputLabel}>
+                Número do Cartão
+              </ThemedText>
               <TextInput
                 style={styles.textInput}
-                value={expiryMonth}
-                onChangeText={(text) => {
-                  const month = text.replace(/\D/g, "");
-                  if (parseInt(month) <= 12) {
-                    setExpiryMonth(month);
+                value={cardNumber}
+                onChangeText={(text) =>
+                  setCardNumber(formatCardNumber(text.replace(/\D/g, "")))
+                }
+                placeholder="0000 0000 0000 0000"
+                placeholderTextColor="#999"
+                maxLength={19}
+                keyboardType="numeric"
+              />
+            </View>
+
+            {/* Cardholder Name */}
+            <View style={styles.inputGroup}>
+              <ThemedText style={styles.inputLabel}>Nome do Titular</ThemedText>
+              <TextInput
+                style={styles.textInput}
+                value={cardholderName}
+                onChangeText={setCardholderName}
+                placeholder="Como está no cartão"
+                placeholderTextColor="#999"
+                autoCapitalize="characters"
+              />
+            </View>
+
+            {/* Expiry and CVV Row */}
+            <View style={styles.row}>
+              <View style={[styles.inputGroup, styles.halfWidth]}>
+                <ThemedText style={styles.inputLabel}>Mês</ThemedText>
+                <TextInput
+                  style={styles.textInput}
+                  value={expiryMonth}
+                  onChangeText={(text) => {
+                    const month = text.replace(/\D/g, "");
+                    if (parseInt(month) <= 12) {
+                      setExpiryMonth(month);
+                    }
+                  }}
+                  placeholder="MM"
+                  placeholderTextColor="#999"
+                  maxLength={2}
+                  keyboardType="numeric"
+                />
+              </View>
+
+              <View style={[styles.inputGroup, styles.halfWidth]}>
+                <ThemedText style={styles.inputLabel}>Ano</ThemedText>
+                <TextInput
+                  style={styles.textInput}
+                  value={expiryYear}
+                  onChangeText={(text) =>
+                    setExpiryYear(text.replace(/\D/g, ""))
                   }
-                }}
-                placeholder="MM"
-                placeholderTextColor="#999"
-                maxLength={2}
-                keyboardType="numeric"
-              />
+                  placeholder="AA"
+                  placeholderTextColor="#999"
+                  maxLength={2}
+                  keyboardType="numeric"
+                />
+              </View>
+
+              <View style={[styles.inputGroup, styles.halfWidth]}>
+                <ThemedText style={styles.inputLabel}>CVV</ThemedText>
+                <TextInput
+                  style={styles.textInput}
+                  value={cvv}
+                  onChangeText={(text) => setCvv(text.replace(/\D/g, ""))}
+                  placeholder="123"
+                  placeholderTextColor="#999"
+                  maxLength={4}
+                  keyboardType="numeric"
+                />
+              </View>
             </View>
 
-            <View style={[styles.inputGroup, styles.halfWidth]}>
-              <ThemedText style={styles.inputLabel}>Ano</ThemedText>
-              <TextInput
-                style={styles.textInput}
-                value={expiryYear}
-                onChangeText={(text) => setExpiryYear(text.replace(/\D/g, ""))}
-                placeholder="AA"
-                placeholderTextColor="#999"
-                maxLength={2}
-                keyboardType="numeric"
-              />
-            </View>
-
-            <View style={[styles.inputGroup, styles.halfWidth]}>
-              <ThemedText style={styles.inputLabel}>CVV</ThemedText>
-              <TextInput
-                style={styles.textInput}
-                value={cvv}
-                onChangeText={(text) => setCvv(text.replace(/\D/g, ""))}
-                placeholder="123"
-                placeholderTextColor="#999"
-                maxLength={4}
-                keyboardType="numeric"
-              />
+            {/* Save Button */}
+            <View style={styles.saveButtonContainer}>
+              <TouchableOpacity
+                style={styles.saveButton}
+                onPress={handleSaveCard}
+                disabled={isSaving}
+              >
+                <ThemedText style={styles.saveButtonText}>
+                  {isSaving ? "Salvando..." : "Salvar Cartão"}
+                </ThemedText>
+              </TouchableOpacity>
             </View>
           </View>
-        </View>
-      </View>
-
-      {/* Bottom actions */}
-      <View style={styles.bottomActions}>
-        <TouchableOpacity style={styles.saveButton} onPress={handleSaveCard}>
-          <ThemedText style={styles.saveButtonText}>Salvar Cartão</ThemedText>
-        </TouchableOpacity>
-      </View>
+        </ScrollView>
+      </KeyboardAvoidingView>
     </LinearGradient>
   );
 }
@@ -232,13 +267,15 @@ const styles = StyleSheet.create({
   },
   mainContent: {
     flex: 1,
-    paddingHorizontal: 20,
+  },
+  scrollContent: {
+    flexGrow: 1,
   },
   cardPreview: {
     backgroundColor: Colors.light.tint,
     borderRadius: 16,
     padding: 20,
-    marginBottom: 30,
+    marginHorizontal: 20,
     shadowColor: "#000",
     shadowOffset: { width: 0, height: 4 },
     shadowOpacity: 0.3,
@@ -309,6 +346,8 @@ const styles = StyleSheet.create({
   },
   formContainer: {
     flex: 1,
+    paddingHorizontal: 20,
+    marginTop: 30,
   },
   inputGroup: {
     marginBottom: 20,
@@ -337,11 +376,11 @@ const styles = StyleSheet.create({
   halfWidth: {
     flex: 1,
   },
-  bottomActions: {
-    justifyContent: "center",
+  saveButtonContainer: {
+    marginTop: 20,
     alignItems: "center",
+    justifyContent: "center",
     paddingHorizontal: 20,
-    paddingBottom: 30,
   },
   saveButton: {
     width: 280,

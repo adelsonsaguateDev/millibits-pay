@@ -105,7 +105,7 @@ export default function HomeScreen() {
       {/* Floating Action Button */}
       <TouchableOpacity
         style={styles.floatingButton}
-        onPress={() => router.push("/(home)/add-card")}
+        onPress={() => router.push("/(home)/add-card" as any)}
       >
         <View style={styles.floatingButtonContent}>
           <ThemedText style={styles.floatingButtonLabel}>
