@@ -1,3 +1,4 @@
+// import { API_URL } from "@env";
 import { MilleBitLogo } from "@/components/MilleBitLogo";
 import { ThemedText } from "@/components/ThemedText";
 import { ThemedView } from "@/components/ThemedView";
@@ -14,8 +15,10 @@ import {
   View,
 } from "react-native";
 
+const API_URL = process.env.EXPO_PUBLIC_API_URL as string; 
+
 export default function LoginScreen() {
-  const { signIn, verifyCredentials } = useAuth();
+  const { signIn } = useAuth();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [isLoading, setIsLoading] = useState(false);
@@ -36,18 +39,30 @@ export default function LoginScreen() {
 
     setIsLoading(true);
 
-    try {
-      // Validar as credenciais usando a função do hook
-      const isValid = await verifyCredentials(email.trim(), password);
 
-      if (isValid) {
+
+    try {
+      const response = await fetch(`${API_URL}/users/auth/login`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          email: email.trim(),
+          password: password,
+        }),
+      });
+
+      const data = await response.json();
+
+      if (response.ok) {
         await signIn();
       } else {
-        Alert.alert("Erro", "Email ou senha incorretos. Tente novamente.");
+        Alert.alert("Erro", data.message || "Email ou senha incorretos. Tente novamente.");
         setPassword("");
       }
     } catch (error) {
-      console.error("❌ Erro no login:", error);
+      console.error("❌ Erro no login:", error.message);
       Alert.alert("Erro", "Ocorreu um erro inesperado. Tente novamente.");
     } finally {
       setIsLoading(false);
