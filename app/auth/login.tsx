@@ -1,21 +1,18 @@
-import { Ionicons } from "@expo/vector-icons";
-import React, { useState } from "react";
-import {
-  Alert,
-  Keyboard,
-  StyleSheet,
-  TextInput,
-  TouchableOpacity,
-  TouchableWithoutFeedback,
-  View,
-} from "react-native";
-
 import { MilleBitLogo } from "@/components/MilleBitLogo";
 import { ThemedText } from "@/components/ThemedText";
 import { ThemedView } from "@/components/ThemedView";
 import { AuthColors } from "@/constants/Colors";
 import { useAuth } from "@/hooks/useAuth";
+import { Ionicons } from "@expo/vector-icons";
 import { router } from "expo-router";
+import { useState } from "react";
+import {
+  Alert,
+  StyleSheet,
+  TextInput,
+  TouchableOpacity,
+  View,
+} from "react-native";
 
 export default function LoginScreen() {
   const { signIn, verifyCredentials } = useAuth();
@@ -45,7 +42,6 @@ export default function LoginScreen() {
 
       if (isValid) {
         await signIn();
-        console.log("🔑 Login realizado com sucesso!");
       } else {
         Alert.alert("Erro", "Email ou senha incorretos. Tente novamente.");
         setPassword("");
@@ -62,92 +58,99 @@ export default function LoginScreen() {
     router.back();
   };
 
-  const canSubmit = email.trim() && password.trim();
-
   return (
-    <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
-      <ThemedView style={styles.container}>
-        {/* Banner rosa no topo com logo Mille-bit */}
-        <View style={styles.topBanner}>
-          <TouchableOpacity style={styles.backButton} onPress={handleBack}>
-            <Ionicons name="arrow-back" size={24} color="white" />
-          </TouchableOpacity>
-          <ThemedText style={styles.logoText}>BitPay</ThemedText>
+    <ThemedView style={styles.container}>
+      {/* Header com botão voltar */}
+      <View style={styles.topBanner}>
+        <TouchableOpacity style={styles.backButton} onPress={handleBack}>
+          <Ionicons name="arrow-back" size={24} color="white" />
+        </TouchableOpacity>
+        <View style={styles.logoContainer}>
           <MilleBitLogo width={40} color="white" />
+          <ThemedText style={styles.logoText}>BitPay</ThemedText>
+        </View>
+      </View>
+
+      {/* Conteúdo principal */}
+      <View style={styles.mainContent}>
+        {/* Título */}
+        <View style={styles.textContainer}>
+          <ThemedText style={styles.title}>Entrar</ThemedText>
+          <ThemedText style={styles.description}>
+            Digite seu email e senha para acessar sua conta
+          </ThemedText>
         </View>
 
-        {/* Conteúdo principal */}
-        <View style={styles.mainContent}>
-          {/* Título e descrição */}
-          <View style={styles.textContainer}>
-            <ThemedText style={styles.title}>Entrar</ThemedText>
-            <ThemedText style={styles.description}>
-              Digite seu email e senha para acessar sua conta
-            </ThemedText>
-          </View>
+        {/* Campo de email */}
+        <View style={styles.inputContainer}>
+          <ThemedText style={styles.inputLabel}>Email</ThemedText>
+          <TextInput
+            style={styles.textInput}
+            value={email}
+            onChangeText={setEmail}
+            placeholder="seu@email.com"
+            placeholderTextColor="#D1D5DB"
+            keyboardType="email-address"
+            autoCapitalize="none"
+            autoCorrect={false}
+            selectionColor={AuthColors.primary}
+          />
+        </View>
 
-          {/* Campo de email */}
-          <View style={styles.inputContainer}>
-            <ThemedText style={styles.inputLabel}>Email</ThemedText>
+        {/* Campo de senha */}
+        <View style={styles.inputContainer}>
+          <ThemedText style={styles.inputLabel}>Senha</ThemedText>
+          <View style={styles.passwordContainer}>
             <TextInput
-              style={styles.textInput}
-              value={email}
-              onChangeText={setEmail}
-              placeholder="seu@email.com"
+              style={styles.passwordInput}
+              value={password}
+              onChangeText={setPassword}
+              placeholder="senha123"
               placeholderTextColor="#D1D5DB"
-              keyboardType="email-address"
-              autoCapitalize="none"
-              autoCorrect={false}
+              secureTextEntry={!showPassword}
               selectionColor={AuthColors.primary}
             />
-          </View>
-
-          {/* Campo de senha */}
-          <View style={styles.inputContainer}>
-            <ThemedText style={styles.inputLabel}>Senha</ThemedText>
-            <View style={styles.passwordContainer}>
-              <TextInput
-                style={styles.passwordInput}
-                value={password}
-                onChangeText={setPassword}
-                placeholder="Sua senha"
-                placeholderTextColor="#D1D5DB"
-                secureTextEntry={!showPassword}
-                selectionColor={AuthColors.primary}
+            <TouchableOpacity
+              style={styles.eyeButton}
+              onPress={() => setShowPassword(!showPassword)}
+            >
+              <Ionicons
+                name={showPassword ? "eye-off" : "eye"}
+                size={20}
+                color="#666666"
               />
-              <TouchableOpacity
-                style={styles.eyeButton}
-                onPress={() => setShowPassword(!showPassword)}
-              >
-                <Ionicons
-                  name={showPassword ? "eye-off" : "eye"}
-                  size={20}
-                  color="#666666"
-                />
-              </TouchableOpacity>
-            </View>
-          </View>
-
-          {/* Botão de envio */}
-          <TouchableOpacity
-            style={[styles.submitButton, !canSubmit && styles.disabledButton]}
-            onPress={handleSubmit}
-            disabled={!canSubmit || isLoading}
-          >
-            <ThemedText style={styles.submitButtonText}>
-              {isLoading ? "Entrando..." : "Entrar"}
-            </ThemedText>
-          </TouchableOpacity>
-
-          {/* Informações adicionais */}
-          <View style={styles.infoContainer}>
-            <ThemedText style={styles.infoText}>
-              Esqueceu sua senha? Entre em contato com o suporte.
-            </ThemedText>
+            </TouchableOpacity>
           </View>
         </View>
-      </ThemedView>
-    </TouchableWithoutFeedback>
+
+        {/* Botão de login */}
+        <TouchableOpacity
+          style={[
+            styles.submitButton,
+            (!email.trim() || !password.trim()) && styles.disabledButton,
+          ]}
+          onPress={handleSubmit}
+          disabled={!email.trim() || !password.trim() || isLoading}
+        >
+          <ThemedText style={styles.submitButtonText}>
+            {isLoading ? "Entrando..." : "Entrar"}
+          </ThemedText>
+        </TouchableOpacity>
+
+        {/* Texto para usuários sem conta */}
+        <View style={styles.noAccountContainer}>
+          <ThemedText style={styles.noAccountText}>
+            Não tem uma conta?{" "}
+            <ThemedText
+              style={styles.linkText}
+              onPress={() => router.push("/auth/register" as any)}
+            >
+              Criar conta
+            </ThemedText>
+          </ThemedText>
+        </View>
+      </View>
+    </ThemedView>
   );
 }
 
@@ -165,10 +168,26 @@ const styles = StyleSheet.create({
     paddingTop: 40,
     position: "relative",
   },
+  logoContainer: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 8,
+  },
   logoText: {
+    marginTop: 10,
     fontSize: 24,
     fontWeight: "bold",
     color: "white",
+  },
+  header: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
+    paddingHorizontal: 20,
+    paddingTop: 60,
+    paddingBottom: 20,
+    borderBottomWidth: 1,
+    borderBottomColor: "#f0f0f0",
   },
   backButton: {
     position: "absolute",
@@ -176,29 +195,40 @@ const styles = StyleSheet.create({
     top: 64,
     zIndex: 1,
   },
-  mainContent: {
+  headerTitle: {
     flex: 1,
     alignItems: "center",
+  },
+  headerTitleText: {
+    fontSize: 18,
+    fontWeight: "600",
+    color: "#1a1a1a",
+  },
+  headerSpacer: {
+    width: 40,
+  },
+  mainContent: {
+    flex: 1,
     paddingHorizontal: 32,
     paddingTop: 40,
   },
   textContainer: {
-    alignItems: "center",
     marginBottom: 32,
+    alignItems: "center",
   },
   title: {
     fontSize: 24,
+    lineHeight: 28,
+    textAlign: "center",
     fontWeight: "bold",
     color: "#1a1a1a",
-    marginBottom: 12,
-    textAlign: "center",
+    marginBottom: 10,
   },
   description: {
     fontSize: 16,
-    color: "#666666",
+    color: "#6C757D",
     textAlign: "center",
     lineHeight: 22,
-    paddingHorizontal: 20,
   },
   inputContainer: {
     width: "100%",
@@ -246,7 +276,7 @@ const styles = StyleSheet.create({
   submitButton: {
     backgroundColor: AuthColors.primary,
     paddingVertical: 16,
-    paddingHorizontal: 32,
+    paddingHorizontal: 24,
     borderRadius: 999,
     alignItems: "center",
     shadowColor: AuthColors.shadow,
@@ -259,6 +289,7 @@ const styles = StyleSheet.create({
     elevation: 3,
     minWidth: 200,
     marginTop: 20,
+    alignSelf: "center",
   },
   disabledButton: {
     backgroundColor: "#e0e0e0",
@@ -270,14 +301,16 @@ const styles = StyleSheet.create({
     fontSize: 18,
     fontWeight: "bold",
   },
-  infoContainer: {
+  noAccountContainer: {
     marginTop: 30,
-    paddingHorizontal: 20,
+    alignItems: "center",
   },
-  infoText: {
+  noAccountText: {
     fontSize: 14,
     color: "#666666",
-    textAlign: "center",
-    lineHeight: 20,
+  },
+  linkText: {
+    color: AuthColors.primary,
+    fontWeight: "bold",
   },
 });

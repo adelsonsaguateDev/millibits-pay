@@ -1,3 +1,4 @@
+import { CardStorage } from "@/utils/cardStorage";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { router } from "expo-router";
 import { useEffect, useState } from "react";
@@ -12,13 +13,6 @@ export function useAuth() {
   const [isLoading, setIsLoading] = useState(true);
   const [hasCredentials, setHasCredentials] = useState<boolean | null>(null);
   const [isFirstTime, setIsFirstTime] = useState<boolean | null>(null);
-
-  console.log("🔑 useAuth render:", {
-    isAuthenticated,
-    isLoading,
-    hasCredentials,
-    isFirstTime,
-  });
 
   useEffect(() => {
     // Verificar se o usuário já está autenticado e se tem credenciais
@@ -37,11 +31,6 @@ export function useAuth() {
       const password = await AsyncStorage.getItem(PASSWORD_KEY);
       const hasCreds = email !== null && password !== null;
       setHasCredentials(hasCreds);
-
-      console.log("🔑 checkAuthStatus executado:", {
-        isFirstTimeUser,
-        hasCreds,
-      });
       setIsLoading(false);
     } catch (error) {
       console.error("Erro ao verificar status de autenticação:", error);
@@ -62,11 +51,12 @@ export function useAuth() {
 
   const signOut = async () => {
     try {
-      // Implementar lógica de logout
+      // Clear all cached data for testing purposes
+      await clearAllData();
+
+      // Navigate to auth screen
       router.replace("/auth");
       setIsAuthenticated(false);
-      console.log("🔑 useAuth: signOut executado");
-      // Removido router.replace para evitar conflito com o useEffect no _layout.tsx
     } catch (error) {
       console.error("Erro no logout:", error);
     }
@@ -120,6 +110,31 @@ export function useAuth() {
     }
   };
 
+  const clearAllData = async () => {
+    try {
+      // Clear authentication credentials
+      await clearCredentials();
+
+      // Clear all cards data
+      await CardStorage.clearAllCards();
+
+      // Clear any other cached data that might exist
+      const keys = await AsyncStorage.getAllKeys();
+      const millebitsKeys = keys.filter(
+        (key) =>
+          key.startsWith("@millebits") || key.startsWith("@millibits_pay")
+      );
+
+      if (millebitsKeys.length > 0) {
+        await AsyncStorage.multiRemove(millebitsKeys);
+      }
+
+      console.log("🧹 All cached data cleared for testing");
+    } catch (error) {
+      console.error("Erro ao limpar todos os dados:", error);
+    }
+  };
+
   return {
     isAuthenticated,
     isLoading,
@@ -130,5 +145,6 @@ export function useAuth() {
     setCredentials,
     verifyCredentials,
     clearCredentials,
+    clearAllData,
   };
 }

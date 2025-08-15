@@ -63,7 +63,7 @@ export default function AddCardManualScreen() {
           cvv: cvv,
         });
         Alert.alert("Sucesso", "Cartão adicionado com sucesso!", [
-          { text: "OK", onPress: () => router.back() },
+          { text: "OK", onPress: () => router.push("/(home)") },
         ]);
       } catch (error) {
         Alert.alert("Erro", "Falha ao adicionar cartão.");

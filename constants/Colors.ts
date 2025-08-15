@@ -3,8 +3,8 @@
  * There are many other ways to style your app. For example, [Nativewind](https://www.nativewind.dev/), [Tamagui](https://tamagui.dev/), [unistyles](https://reactnativeunistyles.vercel.app), etc.
  */
 
-const tintColorLight = "#28acac";
-const tintColorDark = "#28acac";
+const tintColorLight = "#E31C79";
+const tintColorDark = "#E31C79";
 
 export const Colors = {
   light: {
@@ -27,7 +27,7 @@ export const Colors = {
 
 // Cores específicas para a tela de autenticação
 export const AuthColors = {
-  primary: "#28acac", // Teal primary color
+  primary: "#E31C79", // Teal primary color
   white: "#FFFFFF",
   shadow: "#000000",
 };

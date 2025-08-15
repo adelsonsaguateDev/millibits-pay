@@ -89,7 +89,10 @@ export default function RegisterScreen() {
           <TouchableOpacity style={styles.backButton} onPress={handleBack}>
             <Ionicons name="arrow-back" size={24} color="white" />
           </TouchableOpacity>
-          <MilleBitLogo width={60} height={55} color="white" />
+          <View style={styles.logoContainer}>
+            <MilleBitLogo width={40} color="white" />
+            <ThemedText style={styles.logoText}>BitPay</ThemedText>
+          </View>
         </View>
 
         {/* Conteúdo principal */}
@@ -196,6 +199,11 @@ const styles = StyleSheet.create({
     paddingTop: 40,
     position: "relative",
   },
+  logoContainer: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 8,
+  },
   backButton: {
     position: "absolute",
     left: 24,
@@ -268,6 +276,12 @@ const styles = StyleSheet.create({
     right: 12,
     top: 14,
     padding: 4,
+  },
+  logoText: {
+    marginTop: 10,
+    fontSize: 24,
+    fontWeight: "bold",
+    color: "white",
   },
   submitButton: {
     backgroundColor: AuthColors.primary,

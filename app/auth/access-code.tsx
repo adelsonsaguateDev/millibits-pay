@@ -45,7 +45,6 @@ export default function LoginScreen() {
 
       if (isValid) {
         await signIn();
-        console.log("🔑 Login realizado com sucesso!");
       } else {
         Alert.alert("Erro", "Email ou senha incorretos. Tente novamente.");
         setPassword("");
